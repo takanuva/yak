@@ -1,0 +1,93 @@
+<project name="yak" basedir="." default="jar">
+  <property name="src.dir" value="src"/>
+  <property name="src.3rd" value="3rd"/>
+  <property name="out.dir" value="out"/>
+  <property name="lib.dir" value="lib"/>
+  <target name="clean">
+    <delete dir="${out.dir}"/>
+  </target>
+  <target name="compile-deps">
+    <mkdir dir="${out.dir}/classes"/>
+    <!--javac
+      includeantruntime="false"
+      srcdir="${src.3rd}"
+      destdir="${out.dir}/classes"
+    /-->
+  </target>
+  <target name="compile" depends="compile-deps">
+    <mkdir dir="${out.dir}/classes"/>
+    <javac
+      includeantruntime="false"
+      srcdir="${src.dir}"
+      destdir="${out.dir}/classes"
+      debug="true"
+      debuglevel="lines,vars,source"
+    >
+      <classpath path="out/classes/"/>
+      <compilerarg value="-Xlint:unchecked"/>
+      <compilerarg value="-Xlint:deprecation"/>
+    </javac>
+    <mkdir dir="${out.dir}/jflex"/>
+    <echo message="Generating lexer files..."/>
+    <apply executable="jflex"> 
+      <arg value="-q"/> 
+      <arg value="-d"/> 
+      <arg value="${out.dir}/jflex"/> 
+      <srcfile/>
+      <fileset dir="${src.dir}" includes="**/*.flex"/> 
+    </apply>
+    <javac
+      includeantruntime="false"
+      srcdir="${out.dir}/jflex"
+      destdir="${out.dir}/classes"
+    >
+      <classpath path="out/classes/"/>
+      <compilerarg value="-Xlint:unchecked"/>
+      <compilerarg value="-Xlint:deprecation"/>
+    </javac>
+  </target>
+  <target name="init.gettext" description="Loads the Ant gettext tasks">
+    <taskdef name="gettext-extract" classname="org.xnap.commons.ant.gettext.GettextExtractKeysTask" classpath="${lib.dir}/gettext-ant-tasks-0.9.7.jar"/>
+    <taskdef name="gettext-merge" classname="org.xnap.commons.ant.gettext.GettextMergeKeysTask" classpath="${lib.dir}/gettext-ant-tasks-0.9.7.jar"/>
+    <taskdef name="gettext-generate-default" classname="org.xnap.commons.ant.gettext.GenerateDefaultBundleTask" classpath="${lib.dir}/gettext-ant-tasks-0.9.7.jar"/>
+    <taskdef name="gettext-dist" classname="org.xnap.commons.ant.gettext.GettextDistTask" classpath="${lib.dir}/gettext-ant-tasks-0.9.7.jar"/>
+  </target>
+  <target name="extract-messages" depends="init.gettext">
+    <gettext-extract keysFile="base.pot" poDirectory="po">
+      <fileset dir="${src.dir}" includes="**/*.java"/>
+    </gettext-extract>
+  </target>
+  <target name="merge-messages" depends="extract-messages">
+    <gettext-merge keysFile="base.pot" poDirectory="po"/>
+  </target>
+  <target name="generate-default-bundle" depends="merge-messages">
+    <gettext-generate-default targetBundle="br.com.ekolivre.yak.Messages" outputDirectory="${out.dir}/classes" potfile="po/base.pot"/>
+  </target>
+  <target name="generate-bundles-jar" depends="generate-default-bundle">
+    <gettext-dist targetBundle="br.com.ekolivre.yak.Messages" poDirectory="po" outputDirectory="${out.dir}/classes" percentage="65"/>
+  </target>
+  <target name="translate" depends="compile-deps,generate-bundles-jar">
+  </target>
+  
+  <target name="jar" depends="compile"> <!-- depends on translate -->
+    
+    <mkdir dir="${out.dir}/classes/META-INF/services"/>
+    
+    <echo
+      file="${out.dir}/classes/META-INF/services/javax.script.ScriptEngineFactory"
+      message="br.com.ekolivre.cl.script.CLScriptEngineFactory"
+    />
+    
+    <jar destfile="${out.dir}/${ant.project.name}.jar" basedir="${out.dir}/classes">
+      <fileset dir="res/"/>
+      <manifest>
+        <attribute name="Main-Class" value="br.com.ekolivre.yak.Main"/>
+        <attribute name="Class-Path" value="${manifest.classpath}"/>
+      </manifest>
+    </jar>
+  </target>
+  <target name="run" depends="jar">
+    <java jar="${out.dir}/${ant.project.name}.jar" fork="true"       jvmargs="-enableassertions"
+  />
+  </target>
+</project>
