@@ -28,7 +28,7 @@
       <compilerarg value="-Xlint:deprecation"/>
     </javac>
     <mkdir dir="${out.dir}/jflex"/>
-    <echo message="Generating lexer files..."/>
+    <!--echo message="Generating lexer files..."/>
     <apply executable="jflex"> 
       <arg value="-q"/> 
       <arg value="-d"/> 
@@ -40,11 +40,19 @@
       includeantruntime="false"
       srcdir="${out.dir}/jflex"
       destdir="${out.dir}/classes"
+      debug="true"
+      debuglevel="lines,vars,source"
     >
       <classpath path="out/classes/"/>
       <compilerarg value="-Xlint:unchecked"/>
       <compilerarg value="-Xlint:deprecation"/>
-    </javac>
+    </javac-->
+    <exec executable="sh">
+      <arg value="lexers.sh"/>
+      <arg value="${src.dir}"/>
+      <arg value="${out.dir}/jflex"/>
+      <arg value="${out.dir}/classes"/>
+    </exec>
   </target>
   <target name="init.gettext" description="Loads the Ant gettext tasks">
     <taskdef name="gettext-extract" classname="org.xnap.commons.ant.gettext.GettextExtractKeysTask" classpath="${lib.dir}/gettext-ant-tasks-0.9.7.jar"/>

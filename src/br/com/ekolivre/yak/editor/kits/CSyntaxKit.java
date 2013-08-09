@@ -1,3 +1,9 @@
+/*******************************************************************************
+* Project: YAK Code Editor                                                     *
+* License: GNU LGPL.                                                           *
+* Author: Paulo H. "Taka" Torrens.                                             *
+* E-Mail: paulotorrens@ekolivre.com.br                                         *
+*******************************************************************************/
 package br.com.ekolivre.yak.editor.kits;
 
 import java.util.*;
@@ -33,7 +39,8 @@ public class CSyntaxKit extends NestableSyntaxKit {
   private int i;
   
   //
-  private static class CTokenState extends TokenState {
+  private static class CTokenState
+  extends NestableSyntaxKit.NestableTokenState {
     //
     int state;
     

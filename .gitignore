@@ -1,3 +1,4 @@
+/out/
 *.class
 *.jar
 *.war
@@ -5,3 +6,6 @@
 ~*
 *~
 .DS_Store
+
+# This is a generated file :3
+src/br/com/ekolivre/yak/editor/BayesianClassifier.java

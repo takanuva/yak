@@ -1,16 +1,29 @@
+/*******************************************************************************
+* Project: YAK Code Editor                                                     *
+* License: GNU LGPL.                                                           *
+* Author: Paulo H. "Taka" Torrens.                                             *
+* E-Mail: paulotorrens@ekolivre.com.br                                         *
+*******************************************************************************/
 package br.com.ekolivre.yak.editor;
 
 import java.io.*;
 import java.util.*;
 import static java.lang.System.*;
 
-public abstract class JFlexBasedSyntaxKit extends NestableSyntaxKit {
+public abstract class JFlexBasedSyntaxKit<T> extends NestableSyntaxKit {
   //
-  private class JFlexBasedTokenState extends TokenState {
+  protected class JFlexBasedTokenState
+  extends NestableSyntaxKit.NestableTokenState {
     private int yystate;
+    private T user_data;
     
-    private JFlexBasedTokenState(int state) {
+    private JFlexBasedTokenState(int state, T t) {
       yystate = state;
+      user_data = t;
+    };
+    
+    public T userData() {
+      return user_data;
     };
     
     @Override
@@ -20,19 +33,27 @@ public abstract class JFlexBasedSyntaxKit extends NestableSyntaxKit {
   };
   
   //
+  protected JFlexBasedTokenState yystate;
+  
+  //
   @Override
-  public Token getToken(TokenState state) {
+  @SuppressWarnings("unchecked")
+  public final Token getToken(TokenState state) {
     
     yyreset(getCurrentReader());
     
-    if(state instanceof JFlexBasedTokenState)
-      yybegin(((JFlexBasedTokenState)state).yystate);
-    else yybegin(0);
+    if(state instanceof JFlexBasedSyntaxKit<?>.JFlexBasedTokenState) {
+      yystate = (JFlexBasedTokenState)state;
+      yybegin(yystate.yystate);
+    } else {
+      yystate = new JFlexBasedTokenState(0, null);
+      yybegin(0);
+    };
     
     try {
       return yylex();
     } catch(IOException e) {
-      //
+      // Never happens
     };
     
     return null;
@@ -41,20 +62,35 @@ public abstract class JFlexBasedSyntaxKit extends NestableSyntaxKit {
   /**
    *
    */
-  protected Token token(AbstractTokenType type) {
-    return token(type, null);
+  protected final Token token(AbstractTokenType type) {
+    return token(type, null, null);
   };
   
   /**
    *
    */
-  protected Token token(AbstractTokenType type, Integer match) {
+  protected final Token token(AbstractTokenType type, Integer match) {
+    return token(type, match, null);
+  };
+  
+  /**
+   *
+   */
+  protected final Token token(AbstractTokenType type, T t) {
+    return token(type, null, t);
+  };
+  
+  /**
+   *
+   */
+  protected final Token token(AbstractTokenType type, Integer match, T t) {
     return new Token(
       getCurrentOffset() + yypos(),
       yylength(),
       type,
       new JFlexBasedTokenState(
-        yystate()
+        yystate(),
+        t
       ),
       match
     );

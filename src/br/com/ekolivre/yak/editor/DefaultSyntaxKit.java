@@ -171,14 +171,17 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
     for(DefaultSyntaxKit kit: getArbitraryKitsList()) {
       for(Map.Entry<String, Integer> e: kit.getFileExtensions().entrySet()) {
         if(ext.equals(e.getKey())) {
+          //
           DefaultSyntaxKit res =
             (DefaultSyntaxKit)JEditorPane.createEditorKitForContentType(
               kit.getContentType()
             );
           
+          //
           if(e.getValue() != null)
             res.setDialect(e.getValue());
           
+          //
           return res;
         };
       };
@@ -186,6 +189,16 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
     
     return (DefaultSyntaxKit)JEditorPane.createEditorKitForContentType(
       defaultContentType()
+    );
+  };
+  
+  //
+  public static DefaultSyntaxKit getKitGuessingFileContents(Segment seg) {
+    
+    // TODO: some malefic algorithm for guessing a programming language
+    
+    return (DefaultSyntaxKit)JEditorPane.createEditorKitForContentType(
+      "text/plain"
     );
   };
   

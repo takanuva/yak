@@ -29,20 +29,25 @@ public class OpenFileAction extends AbstractEditorAction {
       
       String exts[] = kit.extensionsAsArray();
       
-      String label = kit.getKitName() + " (";
-      for(String ext: exts)
-        label += "*." + ext + ", ";
-      label = label.substring(0, label.length() - 2) + ")";
+      if(exts != null && exts.length > 0) {
       
-      FileNameExtensionFilter filter = new FileNameExtensionFilter(
-        label,
-        exts
-      );
-      
-      chooser.addChoosableFileFilter(filter);
-      
-      if(kit.getContentType() == DefaultSyntaxKit.defaultContentType())
-        chooser.setFileFilter(filter);
+        String label = kit.getKitName() + " (";
+        for(String ext: exts)
+          label += "*." + ext + ", ";
+        label = label.substring(0, label.length() - 2) + ")";
+        
+        if(label.length() > 2) {
+          FileNameExtensionFilter filter = new FileNameExtensionFilter(
+            label,
+            exts
+          );
+          
+          chooser.addChoosableFileFilter(filter);
+          
+          if(kit.getContentType() == DefaultSyntaxKit.defaultContentType())
+            chooser.setFileFilter(filter);
+        };
+      };
     };
   };
   

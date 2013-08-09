@@ -1,5 +1,8 @@
 /*******************************************************************************
-*                                                                              *
+* Project: YAK Code Editor                                                     *
+* License: GNU LGPL.                                                           *
+* Author: Paulo H. "Taka" Torrens.                                             *
+* E-Mail: paulotorrens@ekolivre.com.br                                         *
 *******************************************************************************/
 package br.com.ekolivre.yak.editor.kits;
 
@@ -15,7 +18,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
 %public
 %unicode
 %type br.com.ekolivre.yak.editor.Token
-%extends br.com.ekolivre.yak.editor.JFlexBasedSyntaxKit
+%extends br.com.ekolivre.yak.editor.JFlexBasedSyntaxKit<Void>
 %caseless
 
 %{
@@ -28,7 +31,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   
   //
   public StructuredTextSyntaxKit() {
-    
+    return;
   };
   
   //
@@ -52,7 +55,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   //
   @Override
   public String getContentType() {
-    return "text/x-st";
+    return "text/x-structured-text";
   };
   
   // 

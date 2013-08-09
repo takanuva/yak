@@ -1,3 +1,9 @@
+/*******************************************************************************
+* Project: YAK Code Editor                                                     *
+* License: GNU LGPL.                                                           *
+* Author: Paulo H. "Taka" Torrens.                                             *
+* E-Mail: paulotorrens@ekolivre.com.br                                         *
+*******************************************************************************/
 package br.com.ekolivre.yak.editor;
 
 import java.awt.*;
@@ -17,6 +23,7 @@ public enum TokenType implements AbstractTokenType {
   DEFAULT               (                0x000000                ),
   DEFAULT_BOLD          (             0x000000, BOLD             ),
   DEFAULT_ITALIC        (            0x000000, ITALIC            ),
+  DEFAULT_BOLD_ITALIC   (    0x000000, (short)(BOLD | ITALIC)    ),
   IDENTIFIER            (                0x000000                ),
   SHEBANG               (0xFFFFFF, 0x0000FF, (short)(TEOL | BOLD)),
   HEADING               (0xFFFFFF, 0x0000FF, (short)(TEOL | BOLD)),

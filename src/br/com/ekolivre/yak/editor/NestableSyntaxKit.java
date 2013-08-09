@@ -1,3 +1,9 @@
+/*******************************************************************************
+* Project: YAK Code Editor                                                     *
+* License: GNU LGPL.                                                           *
+* Author: Paulo H. "Taka" Torrens.                                             *
+* E-Mail: paulotorrens@ekolivre.com.br                                         *
+*******************************************************************************/
 package br.com.ekolivre.yak.editor;
 
 import java.io.*;
@@ -123,6 +129,7 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
     };
   };
   
+  //
   private class CommentTokenState extends TokenState {
     private TokenState next;
     private String close;
@@ -169,16 +176,24 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
     };
   };
   
-  
+  //
   private class DocTokenState extends CommentTokenState {
     private DocTokenState(TokenState next, String close) {
       super(next, close, DOC_COMMENT);
     };
   };
   
+  //
   private class SpecTokenState extends CommentTokenState {
     private SpecTokenState(TokenState next, String close) {
       super(next, close, SPEC_COMMENT);
+    };
+  };
+  
+  //
+  protected static abstract class NestableTokenState extends TokenState {
+    protected NestableTokenState() {
+      
     };
   };
   
@@ -199,6 +214,7 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
     "(?ms:#!.*?(?:$|\\z))"
   );
   
+  //
   private CharSequence seq;
   private int off;
   private int len;
@@ -543,6 +559,9 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
     return 0;
   };
   
+  /**
+   *
+   */
   protected int checkOneOf(String str) {
     
     for(int i = 0; i < str.length(); i++) {
@@ -554,7 +573,12 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
     return 0;
   };
   
-  
+  /**
+   *
+   */
+  protected boolean isAtSOF() {
+    return off == 0;
+  };
   
   
   
@@ -589,7 +613,7 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
    */
   private final Token getToken2(TokenState state) {
     
-    if(off == 0 && enableShebang()) {
+    if(isAtSOF() && enableShebang()) {
       // Look for a shebang line :)
       int i = checkRegex(PATTERN_SHEBANG);
       if(i > 0)
@@ -644,14 +668,14 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
   };
   
   //
-  protected final synchronized Token nestGetToken(NestableSyntaxKit child,
+  /*protected final synchronized Token nestGetToken(NestableSyntaxKit child,
                                                   TokenState state) {
     child.seq = seq;
     child.off = off;
     child.len = len;
     
     return child.getToken2(state);
-  };
+  };*/
   
   //
   protected Reader getCurrentReader() {

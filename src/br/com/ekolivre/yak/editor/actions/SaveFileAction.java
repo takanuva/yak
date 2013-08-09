@@ -32,20 +32,26 @@ public class SaveFileAction extends AbstractEditorAction {
       
       String exts[] = aux.extensionsAsArray();
       
-      String label = aux.getKitName() + " (";
-      for(String ext: exts)
-        label += "*." + ext + ", ";
-      label = label.substring(0, label.length() - 2) + ")";
+      if(exts != null && exts.length > 0) {
       
-      FileNameExtensionFilter filter = new FileNameExtensionFilter(
-        label,
-        exts
-      );
-      
-      chooser.addChoosableFileFilter(filter);
-      
-      if(kit.getContentType() == aux.getContentType())
-        chooser.setFileFilter(filter);
+        String label = aux.getKitName() + " (";
+        for(String ext: exts)
+          label += "*." + ext + ", ";
+        label = label.substring(0, label.length() - 2) + ")";
+        
+        if(label.length() > 2) {
+        
+          FileNameExtensionFilter filter = new FileNameExtensionFilter(
+            label,
+            exts
+          );
+          
+          chooser.addChoosableFileFilter(filter);
+          
+          if(kit.getContentType() == aux.getContentType())
+            chooser.setFileFilter(filter);
+        };
+      };
     };
   };
   
