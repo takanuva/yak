@@ -25,7 +25,26 @@ do
   if [ "$temp" -nt "$output" ]
   then
     
-    javac -cp out/classes/ $temp -d $3
+    javac -cp $3 $temp -d $3
     
   fi
+done
+
+CLASSIFIER=$3/classifier.bys
+
+generate_classifier() {
+  echo "Generating Bayesian classifier..."
+  java -cp $3 br/com/ekolivre/yak/editor/GenericDetectionScanner $4 $CLASSIFIER
+  exit 0
+}
+
+if [ $1/br/com/ekolivre/yak/editor/GenericDetectionScanner.flex -nt $CLASSIFIER ]
+then
+  generate_classifier $1 $2 $3 $4
+fi
+
+for source in $(find $4 -newer $CLASSIFIER)
+do
+  echo $source
+  generate_classifier $1 $2 $3 $4
 done

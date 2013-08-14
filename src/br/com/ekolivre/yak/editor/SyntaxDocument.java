@@ -79,6 +79,11 @@ public class SyntaxDocument extends PlainDocument {
   protected void fireRemoveUpdate(DocumentEvent e) {
     invalidateFrom(e.getOffset());
     super.fireRemoveUpdate(e);
+    
+    //
+    if(e.getOffset() == 0) {
+      // TODO: Handle bug here
+    };
   };
   
   public int getNumberOfLines() {
@@ -114,17 +119,25 @@ public class SyntaxDocument extends PlainDocument {
   };
   
   private void invalidateFrom(int pos) {
-    //
+    // Remove all tokens after given position
     tokens.tailMap(pos).clear();
     
-    //
+    // Check if the position belongs in between the last known token
     while(tokens.size() > 0 && tokens.get(tokens.lastKey()).end() >= pos)
       tokens.pollLastEntry();
     
+    // Always go back a few tokens (to be sure =P)
+    if(tokens.size() > 0) tokens.pollLastEntry();
+    if(tokens.size() > 0) tokens.pollLastEntry();
+    if(tokens.size() > 0) tokens.pollLastEntry();
+    
+    // Check if our tokens need lookbehind
     while(tokens.size() > 0 && tokens.get(tokens.lastKey()).getState()
                                                            .needLookbehind())
       tokens.pollLastEntry();
     
+    // Finally, update our match map
+    /// TODO: remake this
     if(tokens.size() > 0)
       //
       match_map = new MatchTreeMap(

@@ -6,6 +6,7 @@
 *******************************************************************************/
 package br.com.ekolivre.yak.editor.kits;
 
+import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 import br.com.ekolivre.yak.editor.*;
@@ -16,11 +17,15 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
 /**
  *
  */
+@SuppressWarnings("unchecked")
 public class GuessMeSyntaxKit extends NestableSyntaxKit {
   //
   private static class GuessMeTokenState extends TokenState {
     //
     int state = 0;
+    
+    //
+    boolean reset[] = null;
     
     GuessMeTokenState() {
       // TODO
@@ -34,6 +39,30 @@ public class GuessMeSyntaxKit extends NestableSyntaxKit {
   };
   
   //
+  private static final String CLASSIFIER = "/classifier.bys";
+  
+  //
+  private static HashMap<String, HashMap<String, Integer>> classifier;
+  
+  static {
+    
+    try {
+      InputStream is = GuessMeSyntaxKit.class.getResourceAsStream(CLASSIFIER);
+      ObjectInputStream ois = new ObjectInputStream(is);
+      
+      classifier = (HashMap<String, HashMap<String, Integer>>)ois.readObject();
+    } catch(Throwable t) {
+      //
+    };
+    
+  };
+  
+  //
+  public GuessMeSyntaxKit() {
+    
+  };
+  
+  //
   @Override
   protected boolean isWordCharacter(char c) {
     // TODO :3
@@ -44,6 +73,11 @@ public class GuessMeSyntaxKit extends NestableSyntaxKit {
   //
   @Override
   protected final Token getToken(TokenState state) {
+    if(state instanceof GuessMeTokenState) {
+      GuessMeTokenState state2 = (GuessMeTokenState)state;
+      
+    };
+    
     return null;
   };
   
@@ -74,6 +108,6 @@ public class GuessMeSyntaxKit extends NestableSyntaxKit {
   // 
   @Override
   public String getKitName() {
-    return "\0Guess me! :)";
+    return "Guess me! :)";
   };
 };

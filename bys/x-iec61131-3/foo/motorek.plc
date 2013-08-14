@@ -1,0 +1,281 @@
+FUNCTION shr: BYTE
+	VAR_INPUT
+		in: BYTE;
+		nr: BYTE;
+	END_VAR
+	
+loop:
+	LD	nr
+	EQ	0
+	RETC
+
+	LD	nr
+	SUB	1
+	ST	nr
+
+	LD	in
+	DIV	2
+	ST	in
+	ST	shr
+
+	JMP	loop	
+END_FUNCTION
+
+FUNCTION_BLOCK pwm
+	VAR_INPUT
+		pwmval: INT;
+	END_VAR
+	VAR_EXTERNAL
+		Forward: BOOL;
+		Backward: BOOL;
+	END_VAR
+	VAR
+		cc: INT := 0;
+		runback: BOOL;
+	END_VAR
+
+	LD	pwmval
+	LT	0
+	ST	runback
+
+	JMPCN	runpwm
+
+	LD	pwmval
+	STN	pwmval
+
+runpwm:
+	LD	pwmval
+	GE	100
+	JMPCN	cont
+
+	LD	99 
+	ST	pwmval 
+cont:
+	LD	cc
+	ADD	1
+	ST	cc
+	
+	EQ	100
+	JMPCN	norst
+	
+	LD	0
+	ST	cc
+
+norst:	LD	cc
+	GE	pwmval
+	
+	JMPC	pwm2
+
+	LD	runback
+	
+	JMPCN	fwd
+	
+	S	Backward
+	R	Forward
+	
+	RETC
+
+fwd:
+	LD	1
+	S	Forward
+	R	Backward
+
+	RET
+
+pwm2:	LD	1
+	R	Forward
+	R	Backward
+
+	RET
+
+END_FUNCTION_BLOCK
+
+PROGRAM prg_motorek
+	VAR
+		controler: PID;
+		dopwm:	pwm;
+		spwm: INT := 0;
+	END_VAR
+	VAR_EXTERNAL
+		P: DINT;
+		I: DINT;
+		D: DINT;
+		
+		ISAT: DINT;
+
+		Forward: BOOL;
+		SP: DINT;
+
+		RPS: DINT;
+	END_VAR
+
+	LD	P
+	ST	controler.P
+	LD	I
+	ST	controler.I
+	LD	D
+	ST	controler.D
+	LD	ISAT
+	ST	controler.ISAT
+
+	LD	SP
+	SUB	RPS
+
+	ST	controler.PV
+
+	CAL	controler
+
+	LD	controler.AV
+	ST	spwm
+
+exepwm:
+	CAL	dopwm(PWMVal := spwm)
+END_PROGRAM
+
+(* Program for measurement of rotations per sec *)
+(* Forward:  00 10 11 01 00 *)
+(* Backward: 00 01 11 10 00 *)
+PROGRAM prg_otacky
+	VAR
+		CONSTANT StateMask: BYTE := 16#30;
+		StateOld: BYTE := 0;
+		StateNew: BYTE;
+		TimeOld: DINT := 0;
+		Otacky: DINT := 0;
+		citac: DINT := 0;
+	END_VAR
+
+	VAR_EXTERNAL
+		Direction: BOOL;
+		StateInput: BYTE;
+		time: DINT;
+		RPS: DINT;
+	END_VAR
+
+	LD	StateInput
+	AND	StateMask
+
+	shr	4
+
+	ST	StateNew
+	EQ	StateOld
+	RETC
+
+	LD	StateNew
+	EQ	0
+	JMPCN	Test2
+
+	LD	StateOld
+	EQ	1	
+	ST	Direction
+
+	JMP	SaveState
+
+Test2:	LD	StateNew
+	EQ	2
+	JMPCN	Test3
+
+	LD	StateOld
+	EQ	0
+	ST	Direction
+
+	JMP	SaveState
+
+Test3:	LD	StateNew
+	EQ	3
+	JMPCN	Test4
+
+	LD	StateOld
+	EQ	2
+	ST	Direction
+
+	JMP	SaveState
+
+Test4:	LD	StateNew
+	EQ	1
+	JMPCN	SaveState
+
+	LD	StateOld
+	EQ	3
+	ST	Direction
+
+SaveState:
+	LD	StateNew
+	ST	StateOld
+
+	LD	citac
+	ADD	1
+	ST	citac
+
+	EQ	4
+	RETCN
+
+	LD	0
+	ST	citac
+
+	LD	time
+	SUB	TimeOld
+	MUL	4
+	
+	ST	Otacky
+	EQ	0
+	RETC
+
+	LD	10000
+	DIV	Otacky
+	ST	RPS
+
+	LD	time
+	ST	TimeOld
+
+	LD	Direction
+	RETC
+
+	LD	RPS
+	STN	RPS
+END_PROGRAM
+
+PROGRAM	prg_time
+	VAR_EXTERNAL
+		time: DINT;
+	END_VAR
+
+	LD	time
+	ADD	1
+	ST	time
+END_PROGRAM
+
+CONFIGURATION motorek
+	VAR_GLOBAL
+		time: DINT := 0;
+		RPS AT %QB10: DINT := 0;
+
+		SP AT %IB10: DINT;
+
+		(* *)
+		Forward AT %Q0.0: BOOL := FALSE;
+		Backward AT %Q0.1: BOOL := FALSE;
+
+		StateInput AT %IB0: BYTE;
+
+		(* TRUE - otaceni vpred, FALSE - otaceni vzad *)
+		Direction: BOOL := FALSE;
+
+		(* Constants for PID controler *)
+		P: DINT := 4;
+		I: DINT := 1; 
+		D: DINT := 2;
+
+		ISAT: DINT := 100;
+	END_VAR
+
+	RESOURCE xx ON yy
+		TASK rustTask(INTERVAL:=T#10ms);
+		TASK measureRotationTask(SINGLE:=%I1.0);
+		TASK measureRPSTask(INTERVAL:=T#0.1ms);
+
+		PROGRAM p1 WITH rustTask: prg_motorek(); 
+		PROGRAM p2 WITH measureRotationTask: prg_otacky();
+		PROGRAM p3 WITH measureRPSTask: prg_time();
+	END_RESOURCE
+END_CONFIGURATION

@@ -1,0 +1,128 @@
+FUNCTION shl:BYTE
+	VAR_INPUT
+		in: BYTE;
+	END_VAR
+
+	LD	in
+	MUL	2
+	ST	shl
+END_FUNCTION
+
+FUNCTION_BLOCK rust
+	VAR_INPUT
+		in: BYTE;
+	END_VAR
+	VAR_OUTPUT
+		out: BYTE;
+	END_VAR
+	VAR
+		mask: BYTE := 1;
+	END_VAR
+	
+	LD	in
+	OR	mask
+	ST	out
+	
+	LD	mask
+	MUL	2
+	ST	mask
+
+
+	LD	mask
+	EQ	0
+
+	RETCN
+
+	LD	1
+	ST	mask
+END_FUNCTION_BLOCK
+
+PROGRAM prg_rust
+	VAR_IN_OUT
+		outx: BYTE;
+	END_VAR
+	VAR
+		r: rust;
+	END_VAR
+	VAR_EXTERNAL
+		out: BYTE;
+		rust: BOOL;
+		rotace: BOOL;
+	END_VAR	
+
+	LD	outx
+	EQ	16#ff
+	JMPCN	volej
+	LD	0
+	ST	outx
+
+	(* switch to second effect *)
+	R	rust
+	S	rotace
+
+volej:	LD	outx
+	ST	r.in
+	CAL	r
+	LD	r.out
+	ST	outx
+	RET
+
+END_PROGRAM
+
+PROGRAM prg_light1
+	VAR_EXTERNAL
+		out: BYTE;
+	END_VAR
+
+	LD	2#10101010
+	ST	out
+END_PROGRAM
+
+PROGRAM prg_light2
+	VAR_EXTERNAL
+		out: BYTE;
+	END_VAR
+
+	LD	2#01010101
+	ST	out
+END_PROGRAM
+
+PROGRAM prg_rotace
+	VAR_EXTERNAL
+		out: BYTE;
+		rust: BOOL;
+		rotace: BOOL;
+	END_VAR
+
+	LD	out
+	shl
+	ST	out
+	EQ	0
+	RETCN
+	LD	1
+	ST	out
+
+	(* Switch to second effect *)
+	R	rotace
+	S	rust
+END_PROGRAM
+
+CONFIGURATION snake
+	VAR_GLOBAL
+		out AT %QB0: BYTE := 1;
+		rust: BOOL := FALSE;
+		rotace AT %MX0.0: BOOL := TRUE;
+	END_VAR
+
+	RESOURCE xx ON yy
+		TASK rustTask(SINGLE := rust, INTERVAL:=T#0.5s);
+		TASK rotaceTask(SINGLE := %MX0.0, INTERVAL:=T#0.5s); 
+		TASK ligthTask(SINGLE := rotace);
+		TASK ligthTask2(SINGLE := rust);
+
+		PROGRAM p1 WITH rustTask: prg_rust(outx:=out); 
+		PROGRAM p2 WITH rotaceTask: prg_rotace();
+(*		PROGRAM p3 WITH ligthTask: prg_light1(); *)
+(*		PROGRAM p4 WITH ligthTask2: prg_light2(); *)
+	END_RESOURCE
+END_CONFIGURATION

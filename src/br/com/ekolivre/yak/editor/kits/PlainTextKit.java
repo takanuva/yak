@@ -41,7 +41,7 @@ public class PlainTextKit extends DefaultSyntaxKit {
   
   @Override
   public String getKitName() {
-    return "\0Plain Text";
+    return "Plain Text";
   };
   
   @Override

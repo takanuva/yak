@@ -3,6 +3,9 @@
   <property name="src.3rd" value="3rd"/>
   <property name="out.dir" value="out"/>
   <property name="lib.dir" value="lib"/>
+  <property name="samples.dir" value="bys"/>
+  
+  
   <target name="clean">
     <delete dir="${out.dir}"/>
   </target>
@@ -52,6 +55,7 @@
       <arg value="${src.dir}"/>
       <arg value="${out.dir}/jflex"/>
       <arg value="${out.dir}/classes"/>
+      <arg value="${samples.dir}"/>
     </exec>
   </target>
   <target name="init.gettext" description="Loads the Ant gettext tasks">

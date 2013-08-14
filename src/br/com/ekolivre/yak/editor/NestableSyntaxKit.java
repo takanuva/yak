@@ -681,7 +681,7 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
   protected Reader getCurrentReader() {
     if(seq instanceof Segment) {
       Segment seg = (Segment)seq;
-      return new CharArrayReader(seg.array, off, len);
+      return new CharArrayReader(seg.array, off, len - off);
     };
     return new StringReader(seq.subSequence(off, len).toString());
   };

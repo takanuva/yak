@@ -32,7 +32,7 @@ import static java.util.Collections.*;
   };
   
   private void keepTrack() {
-    String s = yytext();
+    String s = yytext().toLowerCase();
     Integer i = tokens.get(s);
     if(i == null)
       i = 0;
@@ -112,7 +112,7 @@ import static java.util.Collections.*;
   public static final void main(String... args) throws Throwable {
     
     int sum = 0;
-    HashMap<String, HashMap<String, Integer>> languages = new HashMap<>();
+    HashMap<String, Map<String, Integer>> languages = new HashMap<>();
     
     File database = new File(args[0]);
     
@@ -139,12 +139,16 @@ import static java.util.Collections.*;
         };
         
         int aux = 0;
-        for(Integer i: map.values())
-          aux += i;
+        //for(Integer i: map.values())
+        //  aux += i;
+        
+        for(Map.Entry<String, Integer> e: map.entrySet()) {
+          aux += e.getValue();
+        };
+        
         
         map.put(null, aux);
         sum += aux;
-        
         
         languages.put(mime, map);
         
@@ -152,32 +156,47 @@ import static java.util.Collections.*;
       
     };
     
-    
+    /*
     GenericDetectionScanner scanner = new GenericDetectionScanner(
       new FileReader(new File(args[1]))
     );
     
     out.printf("File is: %s%n", scanner.classify(languages, sum));
-    
-    
-    
+    */
+    File out = new File(args[1]);
+    ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(out));
+    oos.writeObject(languages);
+    oos.close();
   };
 %}
 
 %%
+
+// Skip newlines
+(" "|\t|\n|\r)+ {
+  // Ignore
+}
 
 // Skip possible comments!
 "/*" ~"*/"         |
 "(*" ~"*)"         |
 "{-" ~"-}"         |
 "\"\"\"" ~"\"\"\"" |
-"<!--" ~"-->"      {
+"<!--" ~"-->"      |
+"<![CDATA[" ~"]]>" |
+"=begin" ~"=end"   |
+^"=" ~[\r\n]"=cut" |
+"#" ~[\r\n]        |
+"DNL" ~[\r\n]      |
+"REM" ~[\r\n]      {
   // Ignore
 }
 
-
 // Skip possible string literals!
-"\"" ~"\"" | "\'" ~"\'" {
+"\"" ~"\""   |
+"\'" ~"\'"   |
+"\"" ~[\r\n] |
+"\'" ~[\r\n] {
   // Ignore
 }
 
@@ -187,47 +206,50 @@ import static java.util.Collections.*;
 }
 
 // Common (multi-character) tokens for many programming languages
-":="                      |
-"<>"                      |
-"<?"                      |
-"?>"                      |
-"<="                      |
-">="                      |
-"<!--"                    |
-"-->"                     |
-"=>"                      |
-"=<"                      |
-"->"                      |
-"<-"                      |
-"!="                      |
-"<<<"                     |
-">>>"                     |
-"<<"                      |
-">>"                      |
-"--"                      |
-"++"                      |
-"**"                      |
-"..."                     |
-"[]"                      |
-":"[\r\n]                 | // Helps to identify Python over Ruby :)
-"||"                      |
-"&&"                      |
-"<"[:jletterdigit:]+">"   |
-"<"[:jletterdigit:]+"/>"  |
-[:letter:]+"#"[:letter:]* |
-[:letter:]*"#"[:letter:]+ |
-[:jletterdigit:]+         {
+":="                          |
+"<>"                          |
+"<?"                          |
+"?>"                          |
+"<="                          |
+">="                          |
+"=>"                          |
+"=<"                          |
+"->"                          |
+"<-"                          |
+"!="                          |
+"<<<"                         |
+">>>"                         |
+"<<"                          |
+">>"                          |
+"--"                          |
+"++"                          |
+"**"                          |
+"..."                         |
+"[]"                          |
+":"[\r\n]                     | // Helps to identify Python over Ruby :)
+"||"                          |
+"&&"                          |
+"<"[:jletterdigit:]+">"       |
+"<"[:jletterdigit:]+"/>"      |
+[:letter:]+"#"[:letter:]*     |
+[:letter:]*"#"[:letter:]+     |
+([:letter:]|[:digit:]|[_\-])+ {
   keepTrack();
-}
-
-// Skip newlines
-" "|\t|\n|\r {
-  // Ignore
 }
 
 // Raw characters (I hope this helps...)
-[^\ \t] {
+[~`!@#$%\^&*()\-\+=\[\]{}\\|/?<>,.:;] {
   keepTrack();
+}
+
+//
+. {
+  
+}
+
+//
+\r|\n {
+  // Ignore
 }
 
 // End Of File

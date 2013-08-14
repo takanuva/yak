@@ -1,11 +1,8 @@
-/out/
-*.class
-*.jar
-*.war
-*.ear
+/out/classes/
+/out/jflex
+
 ~*
 *~
 .DS_Store
-
-# This is a generated file :3
-src/br/com/ekolivre/yak/editor/BayesianClassifier.java
+local/
+/test.*

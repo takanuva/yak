@@ -26,7 +26,9 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   @SuppressWarnings("unchecked")
   private static final Map<String, Integer> extensions_map =
     unmodifiableMap(new HashMap() {{
-      put("st", null);
+      put("iec", null);
+      put("scl", null);
+      put("plc", null);
     }});
   
   //
@@ -55,7 +57,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   //
   @Override
   public String getContentType() {
-    return "text/x-structured-text";
+    return "text/x-iec-61131-3";
   };
   
   // 

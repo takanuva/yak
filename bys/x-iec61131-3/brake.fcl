@@ -1,0 +1,72 @@
+FUNCTION_BLOCK frenada
+
+VAR_INPUT
+    vel : REAL;
+    dist : REAL;
+END_VAR
+
+VAR_OUTPUT
+    brake : REAL;
+END_VAR
+
+FUZZIFY vel // 0 - 35
+	TERM lentisima := (0, 1) (3, 0);
+	TERM lenta := (0, 0) (3, 1) (8, 0);
+	TERM moderada := (5, 0) (10, 1) (15, 1) (20, 0);
+	TERM rapida := (15, 0) (20, 1) (25, 0);
+	TERM rapidisima := (25, 0) (30, 1) (35, 1);
+END_FUZZIFY
+
+FUZZIFY dist // 0 - 500
+	TERM lejos := (60, 0) (100, 1) (500, 1);
+	TERM cerca := (5, 0) (35, 1) (70, 0);
+	TERM cerquisima := (0, 1) (5, 1) (15, 0);
+END_FUZZIFY
+
+DEFUZZIFY brake // 0 - 200
+	TERM nulo := (0, 0);
+	TERM minimo := (0, 1) (5, 0);
+	TERM suave := (0, 0) (5, 1) (15, 0);
+	TERM flojo := (10, 0) (45, 1) (80, 0);
+	TERM brusco := (155, 0) (170, 1) (195, 0);
+	TERM frenazo := (190, 0) (195, 1) (200, 1);
+
+    // Use 'Center Of Gravity' defuzzification method
+    METHOD : COG;
+    // Default value is 0 (if no rule activates defuzzifier)
+    DEFAULT := 0;
+END_DEFUZZIFY
+
+RULEBLOCK No1
+    // Use 'min' for 'and' (also implicit use 'max'
+    // for 'or' to fulfill DeMorgan's Law)
+    AND : PROD;
+    // Use 'min' activation method
+    ACT : MIN;
+    // Use 'max' accumulation method
+    ACCU : MAX;
+
+	RULE  1 : IF vel IS lentisima AND dist IS lejos      THEN brake IS nulo;
+	RULE  2 : IF vel IS lentisima AND dist IS cerca      THEN brake IS nulo;
+	RULE  3 : IF vel IS lentisima AND dist IS cerquisima THEN brake IS minimo;
+
+	RULE  4 : IF vel IS lenta AND dist IS lejos      THEN brake IS nulo;
+	RULE  5 : IF vel IS lenta AND dist IS cerca      THEN brake IS nulo;
+	RULE  6 : IF vel IS lenta AND dist IS cerquisima THEN brake IS suave;
+
+	RULE  7 : IF vel IS moderada AND dist IS lejos      THEN brake IS nulo;
+	RULE  8 : IF vel IS moderada AND dist IS cerca      THEN brake IS minimo;
+	RULE  9 : IF vel IS moderada AND dist IS cerquisima THEN brake IS flojo;
+
+	RULE 10 : IF vel IS rapida AND dist IS lejos        THEN brake IS nulo;
+	RULE 11 : IF vel IS rapida AND dist IS cerca        THEN brake IS flojo;
+	RULE 12 : IF vel IS rapida AND dist IS cerquisima   THEN brake IS brusco;
+
+	RULE 13 : IF vel IS rapidisima AND dist IS lejos      THEN brake IS minimo;
+	RULE 14 : IF vel IS rapidisima AND dist IS cerca      THEN brake IS flojo;
+	RULE 15 : IF vel IS rapidisima AND dist IS cerquisima THEN brake IS frenazo;
+
+
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
