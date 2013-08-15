@@ -63,7 +63,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   // 
   @Override
   public String getKitName() {
-    return "Structured Text";
+    return "IEC 61131-3";
   };
   
   //

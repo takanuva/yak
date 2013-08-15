@@ -76,7 +76,7 @@ import static java.util.Collections.*;
         res = entry.getKey();
       };
       
-      out.printf("Probability for %s is %s%n", entry.getKey(), d);
+      //out.printf("Probability for %s is %s%n", entry.getKey(), d);
       
     };
     
@@ -166,6 +166,7 @@ import static java.util.Collections.*;
     File out = new File(args[1]);
     ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(out));
     oos.writeObject(languages);
+    oos.writeInt(sum);
     oos.close();
   };
 %}

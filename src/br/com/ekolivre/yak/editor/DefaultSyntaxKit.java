@@ -166,16 +166,18 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
   };
   
   //
+  public static DefaultSyntaxKit getKitForContentType(String type) {
+    return (DefaultSyntaxKit)JEditorPane.createEditorKitForContentType(type);
+  };
+  
+  //
   public static DefaultSyntaxKit getKitForFileExtension(String ext) {
     
     for(DefaultSyntaxKit kit: getArbitraryKitsList()) {
       for(Map.Entry<String, Integer> e: kit.getFileExtensions().entrySet()) {
         if(ext.equals(e.getKey())) {
           //
-          DefaultSyntaxKit res =
-            (DefaultSyntaxKit)JEditorPane.createEditorKitForContentType(
-              kit.getContentType()
-            );
+          DefaultSyntaxKit res = getKitForContentType(kit.getContentType());
           
           //
           if(e.getValue() != null)
@@ -187,9 +189,7 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
       };
     };
     
-    return (DefaultSyntaxKit)JEditorPane.createEditorKitForContentType(
-      defaultContentType()
-    );
+    return getKitForContentType(defaultContentType());
   };
   
   //
@@ -197,9 +197,7 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
     
     // TODO: some malefic algorithm for guessing a programming language
     
-    return (DefaultSyntaxKit)JEditorPane.createEditorKitForContentType(
-      "text/plain"
-    );
+    return getKitForContentType("text/plain");
   };
   
   //

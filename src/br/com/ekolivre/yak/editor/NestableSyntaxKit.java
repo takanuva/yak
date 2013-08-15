@@ -678,12 +678,28 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
   };*/
   
   //
-  protected Reader getCurrentReader() {
+  protected final Reader getCurrentReader() {
+    return getReader(off, len - off);
+  };
+  
+  //
+  protected final Reader getFullReader() {
+    return getReader(0, seq.length());
+  };
+  
+  //
+  protected final Reader getReader(int from, int len) {
+    // Be sure we don't get too much input
+    int diff = seq.length() - (from + len);
+    if(diff < 0)
+      len -= diff;
+    
+    // Get the appropriate reader
     if(seq instanceof Segment) {
       Segment seg = (Segment)seq;
-      return new CharArrayReader(seg.array, off, len - off);
+      return new CharArrayReader(seg.array, from, len);
     };
-    return new StringReader(seq.subSequence(off, len).toString());
+    return new StringReader(seq.subSequence(from, from + len).toString());
   };
   
   //

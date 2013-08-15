@@ -95,6 +95,7 @@ public final class Main extends JFrame {
     //openFile(new File("test.jav"));
     //openFile(new File("test.plc"));
     //openFile(new File("test.prg"));
+    openUntitledFile("text/x-source-code");
     //
   };
   
