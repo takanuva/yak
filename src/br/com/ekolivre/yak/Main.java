@@ -95,7 +95,7 @@ public final class Main extends JFrame {
     //openFile(new File("test.jav"));
     //openFile(new File("test.plc"));
     //openFile(new File("test.prg"));
-    openUntitledFile("text/x-source-code");
+    //openUntitledFile("text/x-source-code");
     //
   };
   
@@ -358,8 +358,7 @@ public final class Main extends JFrame {
                                            kit.getDialect(),
                                            this::setContentOfActiveTab));
     
-    
-    
+    repaint();
     
   };
   
@@ -529,9 +528,6 @@ public final class Main extends JFrame {
     } catch(Throwable t) {
       return false;
     };
-    
-    
-    
     
     return true;
   };

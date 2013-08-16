@@ -21,10 +21,10 @@ import static java.util.Collections.*;
 %type void
 
 %{
-  private HashMap<String, Integer> tokens;
+  private LinkedHashMap<String, Integer> tokens;
   private String prev;
   
-  private void learn(HashMap<String, Integer> map)
+  private void learn(LinkedHashMap<String, Integer> map)
   throws IOException {
     tokens = map;
     prev = null;
@@ -50,10 +50,10 @@ import static java.util.Collections.*;
   };
   
   public String classify(
-    HashMap<String, HashMap<String, Integer>> languages, int sum
+    LinkedHashMap<String, LinkedHashMap<String, Integer>> languages, int sum
   ) {
     //
-    tokens = new HashMap<String, Integer>();
+    tokens = new LinkedHashMap<String, Integer>();
     prev = null;
     try {
       yylex();
@@ -66,7 +66,7 @@ import static java.util.Collections.*;
     Double max = null;
     
     //
-    for(Map.Entry<String, HashMap<String, Integer>> entry:
+    for(Map.Entry<String, LinkedHashMap<String, Integer>> entry:
         languages.entrySet()) {
       
       double d = tokens_probability(entry.getValue(), sum);
@@ -84,7 +84,7 @@ import static java.util.Collections.*;
     return res;
   };
   
-  private double tokens_probability(HashMap<String, Integer> language,
+  private double tokens_probability(LinkedHashMap<String, Integer> language,
                                     int sum) {
     double res = 0.0;
     for(String token: tokens.keySet()) {
@@ -97,7 +97,7 @@ import static java.util.Collections.*;
   };
   
   private double token_probability(String token,
-                                   HashMap<String, Integer> language, int sum) {
+                                   LinkedHashMap<String, Integer> language, int sum) {
     if(language.size() == 0)
       return 1.0;
     
@@ -109,10 +109,30 @@ import static java.util.Collections.*;
     
   };
   
+  private static final void learn(File file,
+                                  LinkedHashMap<String, Integer> map) {
+    //
+    if(file.isDirectory()) {
+      for(File child: file.listFiles()) {
+        learn(child, map);
+      };
+    } else {
+      try {
+        GenericDetectionScanner scanner = new GenericDetectionScanner(
+          new FileReader(file)
+        );
+        
+        scanner.learn(map);
+      } catch(Exception e) {
+        return;
+      };
+    };
+  };
+  
   public static final void main(String... args) throws Throwable {
     
     int sum = 0;
-    HashMap<String, Map<String, Integer>> languages = new HashMap<>();
+    LinkedHashMap<String, Map<String, Integer>> languages = new LinkedHashMap<>();
     
     File database = new File(args[0]);
     
@@ -120,23 +140,13 @@ import static java.util.Collections.*;
       
       for(File dir: database.listFiles()) {
         
-        HashMap<String, Integer> map = new HashMap<>();        
+        LinkedHashMap<String, Integer> map = new LinkedHashMap<>();        
         String mime = "text/" + dir.getName();
         
         if(!dir.isDirectory())
           continue;
         
-        for(File file: dir.listFiles()) {
-          try {
-            GenericDetectionScanner scanner = new GenericDetectionScanner(
-              new FileReader(file)
-            );
-            
-            scanner.learn(map);
-          } catch(Exception e) {
-            continue;
-          };
-        };
+        learn(dir, map);
         
         int aux = 0;
         //for(Integer i: map.values())
@@ -171,86 +181,105 @@ import static java.util.Collections.*;
   };
 %}
 
+%state YYNOT_SOF
+
 %%
 
-// Skip newlines
-(" "|\t|\n|\r)+ {
-  // Ignore
-}
-
-// Skip possible comments!
-"/*" ~"*/"         |
-"(*" ~"*)"         |
-"{-" ~"-}"         |
-"\"\"\"" ~"\"\"\"" |
-"<!--" ~"-->"      |
-"<![CDATA[" ~"]]>" |
-"=begin" ~"=end"   |
-^"=" ~[\r\n]"=cut" |
-"#" ~[\r\n]        |
-"DNL" ~[\r\n]      |
-"REM" ~[\r\n]      {
-  // Ignore
-}
-
-// Skip possible string literals!
-"\"" ~"\""   |
-"\'" ~"\'"   |
-"\"" ~[\r\n] |
-"\'" ~[\r\n] {
-  // Ignore
-}
-
-// Skip common number literals
-(0[XxOo])?[A-Fa-f0-9]+[\.A-Fa-f0-9]* {
-  // Ignore
-}
-
-// Common (multi-character) tokens for many programming languages
-":="                          |
-"<>"                          |
-"<?"                          |
-"?>"                          |
-"<="                          |
-">="                          |
-"=>"                          |
-"=<"                          |
-"->"                          |
-"<-"                          |
-"!="                          |
-"<<<"                         |
-">>>"                         |
-"<<"                          |
-">>"                          |
-"--"                          |
-"++"                          |
-"**"                          |
-"..."                         |
-"[]"                          |
-":"[\r\n]                     | // Helps to identify Python over Ruby :)
-"||"                          |
-"&&"                          |
-"<"[:jletterdigit:]+">"       |
-"<"[:jletterdigit:]+"/>"      |
-[:letter:]+"#"[:letter:]*     |
-[:letter:]*"#"[:letter:]+     |
-([:letter:]|[:digit:]|[_\-])+ {
-  keepTrack();
-}
-
-// Raw characters (I hope this helps...)
-[~`!@#$%\^&*()\-\+=\[\]{}\\|/?<>,.:;] {
-  keepTrack();
-}
-
-//
-. {
+<YYINITIAL> {
+  // A shebang line! :3
+  "#!".*[\r\n] {
+    //out.printf("We got a shebang!!!%n");
+    keepTrack();
+  }
   
+  // We didn't get a shebang, just tokenize the remaining file
+  .|\r|\n {
+    yybegin(YYNOT_SOF);
+    yypushback(1);
+  }
 }
 
-//
-\r|\n {
-  // Ignore
+<YYNOT_SOF> {
+  
+  // Skip newlines
+  (" "|\t|\n|\r)+ {
+    // Ignore
+  }
+  
+  // Skip possible comments!
+  "/*" ~"*/"         |
+  "(*" ~"*)"         |
+  "{-" ~"-}"         |
+  "\"\"\"" ~"\"\"\"" |
+  "<!--" ~"-->"      |
+  "<![CDATA[" ~"]]>" |
+  "=begin" ~"=end"   |
+  ^"=" ~[\r\n]"=cut" |
+  "#" ~[\r\n]        |
+  "DNL" ~[\r\n]      |
+  "REM" ~[\r\n]      {
+    // Ignore
+  }
+  
+  // Skip possible string literals!
+  "\"" ~"\""   |
+  "\'" ~"\'"   |
+  "\"" ~[\r\n] |
+  "\'" ~[\r\n] {
+    // Ignore
+  }
+  
+  // Skip common number literals
+  (0[XxOo])?[A-Fa-f0-9]+[\.A-Fa-f0-9]* {
+    // Ignore
+  }
+  
+  // Common (multi-character) tokens for many programming languages
+  ":="                          |
+  "<>"                          |
+  "<?"                          |
+  "?>"                          |
+  "<="                          |
+  ">="                          |
+  "=>"                          |
+  "=<"                          |
+  "->"                          |
+  "<-"                          |
+  "!="                          |
+  "<<<"                         |
+  ">>>"                         |
+  "<<"                          |
+  ">>"                          |
+  "--"                          |
+  "++"                          |
+  "**"                          |
+  "..."                         |
+  "[]"                          |
+  ":"[\r\n]                     | // Helps to identify Python over Ruby :)
+  "||"                          |
+  "&&"                          |
+  "<"[:jletterdigit:]+">"       |
+  "<"[:jletterdigit:]+"/>"      |
+  [:letter:]+"#"[:letter:]*     |
+  [:letter:]*"#"[:letter:]+     |
+  ([:letter:]|[:digit:]|[_\-])+ {
+    keepTrack();
+  }
+  
+  // Raw characters (I hope this helps...)
+  [~`!@#$%\^&*()\-\+=\[\]{}\\|/?<>,.:;] {
+    keepTrack();
+  }
+  
+  //
+  . {
+    
+  }
+  
+  //
+  \r|\n {
+    // Ignore
+  }
 }
 
 // End Of File

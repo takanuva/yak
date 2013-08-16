@@ -1,0 +1,4 @@
+main(argc, argv) char **argv; {
+  printf("Hello, world!\n");
+  return 0;
+};

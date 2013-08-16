@@ -38,8 +38,8 @@ implements Comparable<Token> {
   /**
    *
    */
-  public Token(int offset, int length, AbstractTokenType type,
-               TokenState state, Integer match) {
+  public Token(int offset, int length, AbstractTokenType type, TokenState state,
+               Integer match) {
     //
     assert state != null;
     

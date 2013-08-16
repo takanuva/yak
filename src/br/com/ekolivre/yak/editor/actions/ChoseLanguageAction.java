@@ -4,6 +4,7 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.Component;
 import br.com.ekolivre.yak.editor.*;
+import static java.lang.System.*;
 import static java.util.Collections.*;
 
 public class ChoseLanguageAction extends AbstractEditorAction {
@@ -52,8 +53,9 @@ public class ChoseLanguageAction extends AbstractEditorAction {
     return res;
   };
   
-  private JComboBox<DefaultSyntaxKit> makeComboBox(JComboBox<DialectItem>
-                                                                  dialect_box) {
+  private JComboBox<DefaultSyntaxKit> makeComboBox(
+    JComboBox<DialectItem> dialect_box
+  ) {
     //
     JComboBox<DefaultSyntaxKit> box = new JComboBox<>();
     
@@ -62,7 +64,25 @@ public class ChoseLanguageAction extends AbstractEditorAction {
       DefaultSyntaxKit item = (DefaultSyntaxKit)box.getSelectedItem();
       Map<Integer, String> dialects = item.getDialectList();
       
-      
+      if(dialects != null && dialects.size() > 0) {
+        
+        Integer d = dialect == null ? item.getDefaultDialect() : dialect;
+        
+        for(Map.Entry<Integer, String> i: dialects.entrySet()) {
+          DialectItem aux = new DialectItem(i.getKey(), i.getValue(),
+                                            item.getContentType());
+          
+          dialect_box.addItem(aux);
+          
+          if(i.getKey() == d)
+            dialect_box.setSelectedItem(aux);
+        };
+        
+        dialect_box.setVisible(true);
+        dialect_box.setMaximumSize(dialect_box.getPreferredSize());
+        
+        dilectBoxAddCallback(dialect_box);
+      };
       
     });
     
@@ -101,12 +121,14 @@ public class ChoseLanguageAction extends AbstractEditorAction {
     box.setVisible(false);
     
     //
+    return box;
+  };
+  
+  private void dilectBoxAddCallback(JComboBox<DialectItem> box) {
     box.addActionListener(e -> {
       DialectItem item = (DialectItem)box.getSelectedItem();
+      callback.run(item.content_type, item.index);
     });
-    
-    //
-    return box;
   };
   
 };

@@ -35,14 +35,14 @@ public class GuessMeSyntaxKit extends DefaultSyntaxKit {
     Reader reader;
     
     //
-    Thread thread;
+    Thread thread[];
     
     //
     TokenState child;
     
     //
     GuessMeTokenState(String current_mime[], String mime, Reader reader,
-                      Thread thread, TokenState child) {
+                      Thread thread[], TokenState child) {
       this.current_mime = current_mime;
       this.kit = DefaultSyntaxKit.getKitForContentType(mime);
       this.reader = reader;
@@ -84,7 +84,7 @@ public class GuessMeSyntaxKit extends DefaultSyntaxKit {
   private static final String CLASSIFIER = "/classifier.bys";
   
   //
-  private static HashMap<String, HashMap<String, Integer>> langs;
+  private static LinkedHashMap<String, LinkedHashMap<String, Integer>> langs;
   private static Integer sum;
   
   static {
@@ -93,7 +93,7 @@ public class GuessMeSyntaxKit extends DefaultSyntaxKit {
       InputStream is = GuessMeSyntaxKit.class.getResourceAsStream(CLASSIFIER);
       ObjectInputStream ois = new ObjectInputStream(is);
       
-      langs = (HashMap<String, HashMap<String, Integer>>)ois.readObject();
+      langs = (LinkedHashMap<String, LinkedHashMap<String, Integer>>)ois.readObject();
       sum = ois.readInt();
     } catch(Throwable t) {
       //
@@ -128,15 +128,14 @@ public class GuessMeSyntaxKit extends DefaultSyntaxKit {
       Reader reader = getReader(s, l);
       
       String mime = detectMimeType(reader);
+      String detector[] = {mime};
       
-      String detector[] = new String[1];
-      detector[0] = mime;
-      
-      Thread classifier = classifyDocument(reader, detector);
+      Thread thread = classifyDocument(reader, detector);
+      Thread classifier[] = {thread};
       
       state = new GuessMeTokenState(detector, mime, reader, classifier, state);
       
-      classifier.start();
+      thread.start();
     };
     
     assert state != null;
@@ -144,9 +143,9 @@ public class GuessMeSyntaxKit extends DefaultSyntaxKit {
     
     GuessMeTokenState state2 = (GuessMeTokenState)state;
     
-    if(!state2.thread.isAlive()) {
-      state2.thread = classifyDocument(state2.reader, state2.current_mime);
-      state2.thread.start();
+    if(!state2.thread[0].isAlive()) {
+      state2.thread[0] = classifyDocument(state2.reader, state2.current_mime);
+      state2.thread[0].start();
     };
     
     List<Token> sub = state2.kit.parse(s, o, l, limit, state2.child);
@@ -167,7 +166,8 @@ public class GuessMeSyntaxKit extends DefaultSyntaxKit {
   //
   private Reader getReader(CharSequence seq, int length) {
     
-    int limit = 1000;
+    // Check only the first 10kb of code
+    int limit = 10240;
     if(limit > length)
       length = limit;
     
@@ -184,7 +184,8 @@ public class GuessMeSyntaxKit extends DefaultSyntaxKit {
                                   final String detector[]) {
     return new Thread(() -> {
       try {
-        Thread.sleep(2000000);
+        // Sleep for 4 seconds
+        Thread.sleep(4000000);
         
         String mime = detectMimeType(reader);
         

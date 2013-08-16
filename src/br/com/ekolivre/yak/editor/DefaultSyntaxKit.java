@@ -257,7 +257,8 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
   //
   public static String defaultContentType() {
     //return "text/plain";
-    return "text/x-c";
+    //return "text/x-c";
+    return "text/x-source-code";
   };
   
   //
