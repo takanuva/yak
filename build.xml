@@ -83,14 +83,6 @@
   </target>
   
   <target name="jar" depends="compile"> <!-- depends on translate -->
-    
-    <mkdir dir="${out.dir}/classes/META-INF/services"/>
-    
-    <echo
-      file="${out.dir}/classes/META-INF/services/javax.script.ScriptEngineFactory"
-      message="br.com.ekolivre.cl.script.CLScriptEngineFactory"
-    />
-    
     <jar destfile="${out.dir}/${ant.project.name}.jar" basedir="${out.dir}/classes">
       <fileset dir="res/"/>
       <manifest>

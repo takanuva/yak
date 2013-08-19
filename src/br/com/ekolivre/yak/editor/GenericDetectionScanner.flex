@@ -235,36 +235,60 @@ import static java.util.Collections.*;
   }
   
   // Common (multi-character) tokens for many programming languages
-  ":="                          |
-  "<>"                          |
-  "<?"                          |
-  "?>"                          |
-  "<="                          |
-  ">="                          |
-  "=>"                          |
-  "=<"                          |
-  "->"                          |
-  "<-"                          |
-  "!="                          |
-  "<<<"                         |
-  ">>>"                         |
-  "<<"                          |
-  ">>"                          |
-  "--"                          |
-  "++"                          |
-  "**"                          |
-  "..."                         |
-  "[]"                          |
-  ":"[\r\n]                     | // Helps to identify Python over Ruby :)
-  "||"                          |
-  "&&"                          |
-  "<"[:jletterdigit:]+">"       |
-  "<"[:jletterdigit:]+"/>"      |
-  [:letter:]+"#"[:letter:]*     |
-  [:letter:]*"#"[:letter:]+     |
-  ([:letter:]|[:digit:]|[_\-])+ {
+  ":="                             |
+  "<>"                             |
+  "<?"                             |
+  "?>"                             |
+  "==>"                            |
+  "<=="                            |
+  "<="                             |
+  ">="                             |
+  "=>"                             |
+  "=<"                             |
+  "->"                             |
+  "<-"                             |
+  "!="                             |
+  "<<<"                            |
+  ">>>"                            |
+  "<<"                             |
+  ">>"                             |
+  "--"                             |
+  "++"                             |
+  "**"                             |
+  "..."                            |
+  "==="                            |
+  ";;"                             |
+  "};"                             |
+  "=="                             |
+  "[]"                             |
+  "{}"                             |
+  "[=]"                            |
+  "[&]"                            |
+  "+="                             |
+  "-="                             |
+  "|="                             |
+  "/="                             |
+  "*="                             |
+  "^="                             |
+  "&="                             |
+  "%="                             |
+  "@="                             |
+  "~="                             |
+  "?:"                             |
+  "``"                             |
+  ":"[\r\n]                        | // Helps to identify Python over Ruby :)
+  "||"                             |
+  "&&"                             |
+  "^^"                             |
+  "<"[:jletterdigit:]+">"          |
+  "<"[:jletterdigit:]+"/>"         |
+  [:letter:]+"#"[:letter:]*        |
+  [:letter:]*"#"[:letter:]+        |
+  ([:letter:]|[:digit:]|[_\-@$:])+ {
     keepTrack();
   }
+  
+  // TODO: Think of some way to find APL code
   
   // Raw characters (I hope this helps...)
   [~`!@#$%\^&*()\-\+=\[\]{}\\|/?<>,.:;] {

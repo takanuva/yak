@@ -7,6 +7,7 @@
 package br.com.ekolivre.yak.editor.kits;
 
 import java.util.*;
+import br.com.ekolivre.yak.editor.*;
 import static java.lang.System.*;
 import static java.util.Collections.*;
 import static br.com.ekolivre.yak.editor.TokenType.*;
@@ -17,8 +18,8 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
 
 %public
 %unicode
-%type br.com.ekolivre.yak.editor.Token
-%extends br.com.ekolivre.yak.editor.JFlexBasedSyntaxKit<Void>
+%type Token
+%extends JFlexBasedSyntaxKit<Void>
 
 %{
   //

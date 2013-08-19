@@ -96,6 +96,10 @@ public final class Main extends JFrame {
     //openFile(new File("test.plc"));
     //openFile(new File("test.prg"));
     //openUntitledFile("text/x-source-code");
+    
+    //openFile(new File("bys/x-csharp/add.cs"));
+    //openFile(new File("bys/x-csharp/getset.cs"));
+    
     //
   };
   

@@ -45,6 +45,5 @@ fi
 
 for source in $(find $4 -newer $CLASSIFIER)
 do
-  echo $source
   generate_classifier $1 $2 $3 $4 $5
 done
