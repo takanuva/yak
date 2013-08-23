@@ -1,8 +1,12 @@
 /*******************************************************************************
 * Project: YAK Code Editor                                                     *
-* License: GNU LGPL.                                                           *
+* License: GNU GPL.                                                            *
 * Author: Paulo H. "Taka" Torrens.                                             *
 * E-Mail: paulotorrens@ekolivre.com.br                                         *
+*                                                                              *
+* Ekolivre TI (http://www.ekolivre.com.br) claims rights over this software;   *
+*   you may use for educational or personal uses. For comercial use (even as   *
+*   a library), please contact the author.                                     *
 ********************************************************************************
 * This file is part of Ekolivre's YAK.                                         *
 *                                                                              *
@@ -108,7 +112,7 @@ public final class Main extends JFrame {
     //openFile(new File("test.lsp"));
     //openFile(new File("test.psy"));
     //openFile(new File("test.jav"));
-    //openFile(new File("test.plc"));
+    openFile(new File("test.plc"));
     //openFile(new File("test.prg"));
     //openUntitledFile("text/x-source-code");
     
@@ -123,7 +127,7 @@ public final class Main extends JFrame {
     System.setProperty("apple.laf.useScreenMenuBar", "true");
     System.setProperty("com.apple.mrj.application.apple.menu.about.name",
                        getAppName());
-    System.setProperty("awt.useSystemAAFontSettings","on");
+    System.setProperty("awt.useSystemAAFontSettings", "on");
     System.setProperty("swing.aatext", "true");
     
     //
@@ -545,6 +549,8 @@ public final class Main extends JFrame {
       setContentTypeForFile(editor, file);
       editor.read(new FileReader(file), null);
     } catch(Throwable t) {
+      err.printf("For file [%s]:%n", file);
+      t.printStackTrace();
       return false;
     };
     

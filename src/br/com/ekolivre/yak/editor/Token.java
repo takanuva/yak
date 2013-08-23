@@ -1,8 +1,12 @@
 /*******************************************************************************
 * Project: YAK Code Editor                                                     *
-* License: GNU LGPL.                                                           *
+* License: GNU GPL.                                                            *
 * Author: Paulo H. "Taka" Torrens.                                             *
 * E-Mail: paulotorrens@ekolivre.com.br                                         *
+*                                                                              *
+* Ekolivre TI (http://www.ekolivre.com.br) claims rights over this software;   *
+*   you may use for educational or personal uses. For comercial use (even as   *
+*   a library), please contact the author.                                     *
 ********************************************************************************
 * This file is part of Ekolivre's YAK.                                         *
 *                                                                              *
@@ -156,6 +160,6 @@ implements Comparable<Token> {
    */
   @Override
   public String toString() {
-    return String.format("%s[%d:%d]", type, start(), end());
+    return String.format("%s[%d:%d|%s]", getType(), start(), end(), getState());
   };
 };

@@ -1,8 +1,12 @@
 /*******************************************************************************
 * Project: YAK Code Editor                                                     *
-* License: GNU LGPL.                                                           *
+* License: GNU GPL.                                                            *
 * Author: Paulo H. "Taka" Torrens.                                             *
 * E-Mail: paulotorrens@ekolivre.com.br                                         *
+*                                                                              *
+* Ekolivre TI (http://www.ekolivre.com.br) claims rights over this software;   *
+*   you may use for educational or personal uses. For comercial use (even as   *
+*   a library), please contact the author.                                     *
 ********************************************************************************
 * This file is part of Ekolivre's YAK.                                         *
 *                                                                              *
@@ -41,8 +45,8 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   //
   public static final int ST = 0x01;
   public static final int IL = 0x02;
-  public static final int FB = 0x04;
-  public static final int ALL = ST | IL | FB;
+  //public static final int SFC = 0x04;
+  public static final int ALL = ST | IL /*| SFC*/;
   
   //
   @SuppressWarnings("unchecked")
@@ -50,7 +54,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
     unmodifiableMap(new HashMap() {{
       put(ST,  "Structured Text");
       put(IL,  "Instruction List");
-      put(FB,  "Function B. Diagram");
+      //put(SFC, "Sequential Function Chart");
       put(ALL, "Mixed Code");
     }});
   
@@ -124,9 +128,750 @@ TIME_LIT = {TIME}{DAY}
 //
 %state YYSTRING
 
+%state YYTYPE
+%state YYSTRUCT
+%state YYVAR
+%state YYFB
+%state YYFUN
+%state YYPROGRAM
+%state YYSTEP
+%state YYTRANSITION
+%state YYACTION
+%state YYCONFIGURATION
+%state YYRESOURCE
+
+%state YYIF
+%state YYCASE
+%state YYFOR
+%state YYWHILE
+%state YYREPEAT
+
+%state YYIL
+%state YYST
+
 %%
 
-<YYINITIAL> {
+<YYTYPE> {
+  //
+  "ELSIF"              |
+  "ELSE"               |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_WHILE"          |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "END_TYPE" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYSTRUCT> {
+  //
+  "ELSIF"              |
+  "ELSE"               |
+  "END_TYPE"           |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_WHILE"          |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "END_STRUCT" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYVAR> {
+  //
+  "ELSIF"              |
+  "ELSE"               |
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_WHILE"          |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "END_VAR" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYFUN> {
+  //
+  "ELSIF"              |
+  "ELSE"               |
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_WHILE"          |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "END_FUNCTION" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYFB> {
+  //
+  "ELSIF"              |
+  "ELSE"               |
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_WHILE"          |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "END_FUNCTION_BLOCK" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYPROGRAM> {
+  //
+  "ELSIF"              |
+  "ELSE"               |
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_WHILE"          |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "END_PROGRAM" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYSTEP> {
+  //
+  "ELSIF"              |
+  "ELSE"               |
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_WHILE"          |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "END_STEP" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYTRANSITION> {
+  //
+  "ELSIF"              |
+  "ELSE"               |
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_WHILE"          |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "END_TRANSITION" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYACTION> {
+  //
+  "ELSIF"              |
+  "ELSE"               |
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_WHILE"          |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "END_ACTION" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYCONFIGURATION> {
+  //
+  "ELSIF"              |
+  "ELSE"               |
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_WHILE"          |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "END_CONFIGURATION" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYRESOURCE> {
+  "ELSIF"              |
+  "ELSE"               |
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_WHILE"          |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "END_RESOURCE" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYIF> {
+  //
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_WHILE"          |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "ELSIF" |
+  "ELSE"  {
+    return token(KEYWORD);
+  }
+  
+  //
+  "END_IF" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYCASE> {
+  //
+  "ELSIF"              |
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_FOR"            |
+  "END_WHILE"          |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "ELSE" {
+    return token(KEYWORD);
+  }
+  
+  //
+  "END_CASE" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYFOR> {
+  //
+  "ELSIF"              |
+  "ELSE"               |
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_WHILE"          |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "END_FOR" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYWHILE> {
+  //
+  "ELSIF"              |
+  "ELSE"               |
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_REPEAT"         {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "END_WHILE" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYREPEAT> {
+  "ELSIF"              |
+  "ELSE"               |
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_WHILE"          {
+    return token(KEYWORD.misspell());
+  }
+  
+  //
+  "END_REPEAT" {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYINITIAL,YYTYPE,YYSTRUCT,YYVAR,YYFB,YYFUN,YYPROGRAM,YYSTEP,YYTRANSITION,
+ YYACTION,YYCONFIGURATION,YYRESOURCE,YYIF,YYCASE,YYFOR,YYWHILE,YYREPEAT,YYIL,
+ YYST> {
+  //
+  "(*" {
+    return checkComment("(*", "*)");
+  }
+  
+  //
+  "//" {
+    return checkComment("//");
+  }
+  
+  //
+  "'"("$".|[^\'\r\n])*$ {
+    return token(STRING_INCOMPLETE);
+  }
+  
+  //
+  "'" {
+    yypush(YYSTRING);
+    return token(STRING);
+  }
+  
+  //
+  [-+=<>?,.;:\^&|*]+ {
+    return token(PUNCTUATION);
+  }
+  
+  //
+  "TYPE" {
+    yypush(YYTYPE);
+    return token(KEYWORD);
+  }
+  
+  //
+  "STRUCT" {
+    yypush(YYSTRUCT);
+    return token(KEYWORD);
+  }
+  
+  //
+  "VAR"          |
+  "VAR_INPUT"    |
+  "VAR_OUTPUT"   |
+  "VAR_IN_OUT"   |
+  "VAR_EXTERNAL" |
+  "VAR_ACCESS"   |
+  "VAR_GLOBAL"   {
+    yypush(YYVAR);
+    return token(KEYWORD);
+  }
+  
+  //
+  "FUNCTION_BLOCK" {
+    yypush(YYFB);
+    return token(KEYWORD);
+  }
+  
+  //
+  "FUNCTION" {
+    yypush(YYFUN);
+    return token(KEYWORD);
+  }
+  
+  //
+  "PROGRAM" {
+    yypush(YYPROGRAM);
+    return token(KEYWORD);
+  }
+  
+  //
+  "INITIAL_STEP" |
+  "STEP"         {
+    yypush(YYSTEP);
+    return token(KEYWORD);
+  }
+  
+  //
+  "TRANSITION" {
+    yypush(YYTRANSITION);
+    return token(KEYWORD);
+  }
+  
+  //
+  "ACTION" {
+    yypush(YYACTION);
+    return token(KEYWORD);
+  }
+  
+  //
+  "CONFIGURATION" {
+    yypush(YYCONFIGURATION);
+    return token(KEYWORD);
+  }
+  
+  //
+  "RESOURCE" {
+    yypush(YYRESOURCE);
+    return token(KEYWORD);
+  }
+  
+  //
+  "IF" {
+    yypush(YYIF);
+    if(yystate() == YYIL)
+      return token(KEYWORD.misspell());
+    return token(KEYWORD);
+  }
+  
+  //
+  "CASE" {
+    yypush(YYCASE);
+    return token(KEYWORD);
+  }
+  
+  //
+  "FOR" {
+    yypush(YYFOR);
+    return token(KEYWORD);
+  }
+  
+  //
+  "WHILE" {
+    yypush(YYWHILE);
+    return token(KEYWORD);
+  }
+  
+  //
+  "REPEAT" {
+    yypush(YYREPEAT);
+    return token(KEYWORD);
+  }
+  
+  //
+  "TRUE"          |
+  "FALSE"         |
+  "TIME_OF_DAY"   |
+  "TOD"           |
+  "DATE"          |
+  "D"             |
+  "DATE_AND_TIME" |
+  "DT"            |
+  "STRING"        |
+  "TIME"          |
+  "SINT"          |
+  "INT"           |
+  "DINT"          |
+  "LINT"          |
+  "USINT"         |
+  "UINT"          |
+  "UDINT"         |
+  "ULINT"         |
+  "REAL"          |
+  "LREAL"         |
+  "BOOL"          |
+  "BYTE"          |
+  "WORD"          |
+  "DWORD"         |
+  "LWORD"         |
+  "ANY"           |
+  "ANY_NUM"       |
+  "ANY_REAL"      |
+  "ANY_INT"       |
+  "ANY_BIT"       |
+  "ANY_DATE"      |
+  "ARRAY"         |
+  "OF"            |
+  "R_EDGE"        |
+  "F_EDGE"        |
+  "RETAIN"        |
+  "CONSTANT"      |
+  "AT"            |
+  "FROM"          |
+  "TO"            |
+  "READ_WRITE"    |
+  "READ_ONLY"     |
+  "TASK"          |
+  "SINGLE"        |
+  "INTERVAL"      |
+  "PRIORITY"      |
+  "WITH"          |
+  "OR"            |
+  "XOR"           |
+  "AND"           |
+  "MOD"           |
+  "NOT"           |
+  "RETURN"        |
+  "THEN"          |
+  "DO"            |
+  "BY"            |
+  "UNTIL"         |
+  "EXIT"          {
+    return token(KEYWORD);
+  }
+  
+  //
+  [:jletter:][:jletterdigit:]* {
+    return token(IDENTIFIER);
+  }
+  
+  //
+  "%"[QIMqim][XBWDLxbwdl][:digit:]+              |
+  "%"[QIMqim][XBWDLxbwdl][:digit:]+"."[:digit:]+ |
+  "%"[Rr][XBWDLxbwdl][:digit:]+                  {
+    return token(SYMBOL);
+  }
+  
+  //
+  "%"[:jletterdigit:]* {
+    return token(SYMBOL.misspell());
+  }
+  
+  //
+  {INT}                                                                    |
+  {FIXED}                                                                  |
+  {TIME_LIT}                                                               |
+  ("TIME_OF_DAY"|"TOD")"#"{INT}":"{INT}":"{INT}                            |
+  ("TIME_OF_DAY"|"TOD")"#"{INT}":"{INT}":"{FIXED}                          |
+  ("DATE"|"D")"#"{INT}"-"{INT}"-"{INT}                                     |
+  ("DATE_AND_TIME"|"DT")"#"{INT}"-"{INT}"-"{INT}"-"{INT}":"{INT}":"{INT}   |
+  ("DATE_AND_TIME"|"DT")"#"{INT}"-"{INT}"-"{INT}"-"{INT}":"{INT}":"{FIXED} {
+    return token(NUMBER);
+  }
+  
+  //
+  ([:jletterdigit:]|_)*"#"([:jletterdigit:]|_|"."|":"|"-")+ |
+  ([:jletterdigit:]|_)+"#"([:jletterdigit:]|_|"."|":"|"-")* {
+    return token(NUMBER.misspell());
+  }
+  
+  //
+  .|\r|\n {
+    return null;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*<YYINITIAL> {
   //
   "//" {
     return checkComment("//");
@@ -280,7 +1025,6 @@ TIME_LIT = {TIME}{DAY}
   }
   
   //
-  //
   "'"("$".|[^\'\\\r\n])*$ {
     return token(STRING_INCOMPLETE);
   }
@@ -316,36 +1060,28 @@ TIME_LIT = {TIME}{DAY}
     return token(PUNCTUATION, -'[');
   }
   
-  /*//
-  "{" {
-    return token(PUNCTUATION, +'{');
-  }
-  
-  //
-  "}" {
-    return token(PUNCTUATION, -'{');
-  }*/
-  
   //
   .|\r|\n {
     return null;
   }
-}
+}*/
+
 
 <YYSTRING> {
   //
   "'" {
-    yybegin(YYINITIAL);
+    yypop();
     return token(STRING);
   }
   
   //
   "$". {
+    out.printf("hmmm...%n");
     return token(STRING_ESCAPE);
   }
   
   //
-  [^\'$\r\n]+ {
+  [^\'\$\r\n]+ {
     return token(STRING);
   }
 }

@@ -1,8 +1,12 @@
 /*******************************************************************************
 * Project: YAK Code Editor                                                     *
-* License: GNU LGPL.                                                           *
+* License: GNU GPL.                                                            *
 * Author: Paulo H. "Taka" Torrens.                                             *
 * E-Mail: paulotorrens@ekolivre.com.br                                         *
+*                                                                              *
+* Ekolivre TI (http://www.ekolivre.com.br) claims rights over this software;   *
+*   you may use for educational or personal uses. For comercial use (even as   *
+*   a library), please contact the author.                                     *
 ********************************************************************************
 * This file is part of Ekolivre's YAK.                                         *
 *                                                                              *
@@ -272,13 +276,13 @@ public class SyntaxDocument extends PlainDocument {
       
     } catch(BadLocationException e) {
       return;
-    }/* finally {
-      //out.printf("%n%n%n%n");
-      out.printf("  Document's tokens:%n ");
+    } finally {
+      /*//out.printf("%n%n%n%n");
+      out.printf("  Document's tokens:%n");
       for(Token t: tokens.values())
-        out.printf(" %s", t);
-      out.printf("%n%n%n%n");
-    }*/;
+        out.printf("  %s%n", t);
+      out.printf("%n%n%n%n");*/
+    };
   };
   
   public void getDisplayText(int pos, int len, Segment seg)

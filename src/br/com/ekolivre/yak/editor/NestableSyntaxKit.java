@@ -1,8 +1,12 @@
 /*******************************************************************************
 * Project: YAK Code Editor                                                     *
-* License: GNU LGPL.                                                           *
+* License: GNU GPL.                                                            *
 * Author: Paulo H. "Taka" Torrens.                                             *
 * E-Mail: paulotorrens@ekolivre.com.br                                         *
+*                                                                              *
+* Ekolivre TI (http://www.ekolivre.com.br) claims rights over this software;   *
+*   you may use for educational or personal uses. For comercial use (even as   *
+*   a library), please contact the author.                                     *
 ********************************************************************************
 * This file is part of Ekolivre's YAK.                                         *
 *                                                                              *
@@ -64,6 +68,12 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
     public boolean isComment() {
       return false;
     };
+    
+    //
+    @Override
+    public String toString() {
+      return "SOL";
+    };
   };
   
   /* package */
@@ -116,6 +126,12 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
     public boolean isComment() {
       return true;
     };
+    
+    //
+    @Override
+    public String toString() {
+      return "EOL";
+    };
   };
   
   /* package */
@@ -142,6 +158,12 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
     public boolean isComment() {
       return true;
     };
+    
+    //
+    @Override
+    public String toString() {
+      return "WHITE";
+    };
   };
   
   //
@@ -149,6 +171,10 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
     private TokenState next;
     private String close;
     private TokenType type;
+    
+    /**
+     *
+     */
     private CommentTokenState(TokenState next, String close, TokenType type) {
       //
       assert next != null;
@@ -159,6 +185,9 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
       this.type = type;
     };
     
+    /**
+     *
+     */
     private boolean mayClose() {
       if(close == null) {
         if(isNewline())
@@ -176,6 +205,9 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
       return true;
     };
     
+    /**
+     *
+     */
     private Token getToken() {
       
       if(mayClose())
@@ -188,6 +220,12 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
     @Override
     public int state() {
       return 0;
+    };
+    
+    //
+    @Override
+    public String toString() {
+      return "(" + getClass().getSimpleName() + " -> " + next + ")";
     };
   };
   

@@ -1,8 +1,12 @@
 /*******************************************************************************
 * Project: YAK Code Editor                                                     *
-* License: GNU LGPL.                                                           *
+* License: GNU GPL.                                                            *
 * Author: Paulo H. "Taka" Torrens.                                             *
 * E-Mail: paulotorrens@ekolivre.com.br                                         *
+*                                                                              *
+* Ekolivre TI (http://www.ekolivre.com.br) claims rights over this software;   *
+*   you may use for educational or personal uses. For comercial use (even as   *
+*   a library), please contact the author.                                     *
 ********************************************************************************
 * This file is part of Ekolivre's YAK.                                         *
 *                                                                              *
@@ -56,5 +60,13 @@ implements Comparable<TokenState> {
    */
   public boolean toplevel() {
     return state() == 0;
+  };
+  
+  /**
+   *
+   */
+  @Override
+  public String toString() {
+    return "(" + getClass().getSimpleName() + ": " + state() + ")";
   };
 };

@@ -1,8 +1,12 @@
 /*******************************************************************************
 * Project: YAK Code Editor                                                     *
-* License: GNU LGPL.                                                           *
+* License: GNU GPL.                                                            *
 * Author: Paulo H. "Taka" Torrens.                                             *
 * E-Mail: paulotorrens@ekolivre.com.br                                         *
+*                                                                              *
+* Ekolivre TI (http://www.ekolivre.com.br) claims rights over this software;   *
+*   you may use for educational or personal uses. For comercial use (even as   *
+*   a library), please contact the author.                                     *
 ********************************************************************************
 * This file is part of Ekolivre's YAK.                                         *
 *                                                                              *
@@ -36,8 +40,10 @@ import static br.com.ekolivre.yak.editor.AbstractTokenType.*;
 public enum TokenType implements AbstractTokenType {
   //                    +----------------------------------------+
   DEFAULT               (                0x000000                ),
+  
   DEFAULT_BOLD          (             0x000000, BOLD             ),
   DEFAULT_ITALIC        (            0x000000, ITALIC            ),
+  
   DEFAULT_BOLD_ITALIC   (    0x000000, (short)(BOLD | ITALIC)    ),
   IDENTIFIER            (                0x000000                ),
   SHEBANG               (0xFFFFFF, 0x0000FF, (short)(TEOL | BOLD)),

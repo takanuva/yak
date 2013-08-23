@@ -1,8 +1,12 @@
 /*******************************************************************************
 * Project: YAK Code Editor                                                     *
-* License: GNU LGPL.                                                           *
+* License: GNU GPL.                                                            *
 * Author: Paulo H. "Taka" Torrens.                                             *
 * E-Mail: paulotorrens@ekolivre.com.br                                         *
+*                                                                              *
+* Ekolivre TI (http://www.ekolivre.com.br) claims rights over this software;   *
+*   you may use for educational or personal uses. For comercial use (even as   *
+*   a library), please contact the author.                                     *
 ********************************************************************************
 * This file is part of Ekolivre's YAK.                                         *
 *                                                                              *
@@ -30,11 +34,14 @@ public abstract class JFlexBasedSyntaxKit<T> extends NestableSyntaxKit {
   protected class JFlexBasedTokenState
   extends NestableSyntaxKit.NestableTokenState {
     private int yystate;
+    private Stack<Integer> stack;
     private T user_data;
     
-    private JFlexBasedTokenState(int state, T t) {
-      yystate = state;
-      user_data = t;
+    @SuppressWarnings("unchecked")
+    private JFlexBasedTokenState(int state, Stack<Integer> stack, T t) {
+      this.yystate = state;
+      this.stack = (Stack)stack.clone();
+      this.user_data = t;
     };
     
     public T userData() {
@@ -48,27 +55,49 @@ public abstract class JFlexBasedSyntaxKit<T> extends NestableSyntaxKit {
   };
   
   //
+  private Stack<Integer> stack = new Stack<Integer>();
+  
+  //
   protected JFlexBasedTokenState yystate;
+  
+  //
+  public void yypush(int s) {
+    stack.push(yystate());
+    yybegin(s);
+  };
+  
+  //
+  public void yypop() {
+    yybegin(stack.pop());
+  };
+  
+  //
+  protected final Stack<Integer> yystack() {
+    return stack;
+  };
   
   //
   @Override
   @SuppressWarnings("unchecked")
   public final Token getToken(TokenState state) {
-    
+    //
     yyreset(getCurrentReader());
     
+    //
     if(state instanceof JFlexBasedSyntaxKit<?>.JFlexBasedTokenState) {
       yystate = (JFlexBasedTokenState)state;
+      stack = (Stack)yystate.stack.clone();
       yybegin(yystate.yystate);
     } else {
-      yystate = new JFlexBasedTokenState(0, null);
+      yystate = new JFlexBasedTokenState(0, stack, null);
       yybegin(0);
     };
     
+    //
     try {
       return yylex();
     } catch(IOException e) {
-      // Never happens
+      assert false;
     };
     
     return null;
@@ -105,6 +134,7 @@ public abstract class JFlexBasedSyntaxKit<T> extends NestableSyntaxKit {
       type,
       new JFlexBasedTokenState(
         yystate(),
+        stack,
         t
       ),
       match
