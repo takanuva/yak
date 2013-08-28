@@ -125,7 +125,7 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
       
       Collections.sort(list);
       
-      out.printf("We have a total of %d editor kits loaded.%n", list.size());
+      err.printf("We have a total of %d editor kits loaded.%n", list.size());
       
     } catch(IOException e) {
       //
@@ -219,14 +219,6 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
   };
   
   //
-  public static DefaultSyntaxKit getKitGuessingFileContents(Segment seg) {
-    
-    // TODO: some malefic algorithm for guessing a programming language
-    
-    return getKitForContentType("text/plain");
-  };
-  
-  //
   @Override
   public View create(Element element) {
     return new SyntaxView(element, this);
@@ -284,6 +276,7 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
   public static String defaultContentType() {
     //return "text/plain";
     //return "text/x-c";
+    // This will make us guess the source :3
     return "text/x-source-code";
   };
   
@@ -371,5 +364,62 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
   @Override
   public String toString() {
     return getKitName();
+  };
+  
+  /**
+   *
+   */
+  public String toHTML(File file) {
+    
+    try {
+      /*List<Token> parse(CharSequence seg, int offset, int length,
+                                      int limit, TokenState state);*/
+      
+      Scanner scanner = new Scanner(file);
+  
+      String str = "";
+      while(scanner.hasNextLine())
+        str += scanner.nextLine() + "\n";
+      
+      List<Token> tokens = parse(str, 0, str.length(), str.length() + 1, null);
+      
+      String html = "";
+      
+      int i = 0;
+      for(Token t: tokens) {
+        int j = t.start();
+        
+        if(i < j) {
+          html += str.substring(i, j); //.replaceAll("\r\n?|\n", "<br>");
+        };
+        
+        i = t.end();
+        
+        html += t.getType().toHTML(str.substring(j, i));
+      };
+      
+      return String.format(
+        "<code class=\"%s\" style=\"%s\"><pre>%s</pre></code>%n",
+        (
+          getDialect() == 0 ?
+            getContentType()
+          : getContentType()
+        ).substring(5),
+        "font-family: monospaced;",
+        html);
+    } catch(FileNotFoundException e) {
+      exit(-1);
+    };
+    
+    return null;
+  };
+  
+  /**
+   *
+   */
+  public static final void main(String... args) {
+    for(String filename: args) {
+      out.printf(getKitForFileName(filename).toHTML(new File(filename)));
+    };
   };
 };

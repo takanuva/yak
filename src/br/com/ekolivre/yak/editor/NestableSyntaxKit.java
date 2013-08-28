@@ -49,6 +49,12 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
   final AbstractTokenType SOLTokenType = new AbstractTokenType() {
     //
     @Override
+    public String toHTML(String content) {
+      return content;
+    };
+    
+    //
+    @Override
     public int write(Segment s, int x, int y, Graphics g, SyntaxView e,
                      Dimension size, boolean invert) {
       // Just to be sure
@@ -79,6 +85,12 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
   
   /* package */
   final AbstractTokenType EOLTokenType = new AbstractTokenType() {
+    //
+    @Override
+    public String toHTML(String content) {
+      return content;
+    };
+    
     //
     @Override
     public int write(Segment s, int x, int y, Graphics g, SyntaxView e,
@@ -137,6 +149,12 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
   
   /* package */
   final AbstractTokenType WhitespaceTokenType = new AbstractTokenType() {
+    //
+    @Override
+    public String toHTML(String content) {
+      return content;
+    };
+    
     //
     @Override
     public int write(Segment s, int x, int y, Graphics g, SyntaxView e,

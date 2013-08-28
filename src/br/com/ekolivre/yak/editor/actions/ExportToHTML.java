@@ -24,20 +24,3 @@
 * You should have received a copy of the GNU General Public License along with *
 *   YAK.  If not, see <http://www.gnu.org/licenses/>.                          *
 *******************************************************************************/
-package br.com.ekolivre.yak.editor;
-
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.text.*;
-
-public interface AbstractTokenType {
-  public static final short BOLD = 0x01;
-  public static final short ITALIC = 0x02;
-  public static final short TEOL = 0x04;
-  
-  public int compareTo(AbstractTokenType other);
-  public boolean isComment();
-  public String toHTML(String content);
-  public int write(Segment s, int x, int y, Graphics g, SyntaxView e,
-                   Dimension size, boolean invert);
-};

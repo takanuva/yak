@@ -129,6 +129,15 @@ public enum TokenType implements AbstractTokenType {
     return new AbstractTokenType() {
       
       @Override
+      public String toHTML(String content) {
+        return "<span style=\"border-bottom: 1px dotted red; padding:1px\">" +
+                 "<span style=\"border-bottom: 1px dotted red;\">" +
+                   TokenType.this.toHTML(content) +
+                 "</span>" +
+               "</span>";
+      };
+      
+      @Override
       public int write(Segment s, int x, int y, Graphics g, SyntaxView e,
                        Dimension size, boolean invert) {
         return TokenType.this.write(s, x, y, g, e, size, invert, true);
@@ -212,6 +221,40 @@ public enum TokenType implements AbstractTokenType {
   };
   
   //
+  @Override
+  public String toHTML(String content) {
+    
+    String res = content;
+    
+    if(isItalic())
+      res = "<i>" + res + "</i>";
+    if(isBold())
+      res = "<b>" + res + "</b>";
+    
+    res = String.format(
+      "<span style=\"color: #%02X%02X%02X;%s\">%s</span>",
+      getForeground().getRed(),
+      getForeground().getGreen(),
+      getForeground().getBlue(),
+      
+      getBackground() == null ?
+        ""
+      : String.format(
+          " background: %02X%02X%02X;",
+          getBackground().getRed(),
+          getBackground().getGreen(),
+          getBackground().getBlue()
+        ),
+      
+      res
+    );
+    
+    return res;
+  };
+  
+  /**
+   *
+   */
   protected int write(Segment s, int x, int y, Graphics g, SyntaxView e,
                       Dimension size, boolean invert, boolean misspell) {
     //
