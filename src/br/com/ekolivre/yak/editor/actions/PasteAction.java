@@ -24,8 +24,13 @@
 * You should have received a copy of the GNU General Public License along with *
 *   YAK.  If not, see <http://www.gnu.org/licenses/>.                          *
 *******************************************************************************/
-package br.com.ekolivre.yak.editor;
+package br.com.ekolivre.yak.editor.actions;
 
-public class SyntaxKitAdapter {
+import java.io.*;
+import java.awt.*;
+import javax.swing.*;
+import br.com.ekolivre.yak.editor.*;
+
+public abstract class PasteAction extends AbstractEditorAction {
   
 };

@@ -26,6 +26,10 @@
 *******************************************************************************/
 package br.com.ekolivre.yak.editor;
 
-public class SyntaxKitAdapter {
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.text.*;
+
+public class KeywordTooltip {
   
 };

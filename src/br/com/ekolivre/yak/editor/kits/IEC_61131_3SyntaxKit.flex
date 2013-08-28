@@ -4,6 +4,7 @@
 * Author: Paulo H. "Taka" Torrens.                                             *
 * E-Mail: paulotorrens@ekolivre.com.br                                         *
 *                                                                              *
+* Copyright (C) Ekolivre TI, Paulo H. Torrens - 2013.                          *
 * Ekolivre TI (http://www.ekolivre.com.br) claims rights over this software;   *
 *   you may use for educational or personal uses. For comercial use (even as   *
 *   a library), please contact the author.                                     *
@@ -46,7 +47,8 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   public static final int ST = 0x01;
   public static final int IL = 0x02;
   //public static final int SFC = 0x04;
-  public static final int ALL = ST | IL /*| SFC*/;
+  public static final int STL = 0x08;
+  public static final int ALL = ST | IL /*| SFC*/ | STL;
   
   //
   @SuppressWarnings("unchecked")
@@ -65,6 +67,8 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
       put("iec", ALL);
       put("scl", ALL);
       put("plc", ALL);
+      put("stl", ALL);
+      put("awl", ALL);
     }});
   
   //
@@ -102,6 +106,17 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
     return "IEC 61131-3";
   };
   
+  
+  
+  public String getKeywordDescription(String keyword) {
+    switch(keyword.toUpperCase()) {
+      case "ANY":
+        return "" + "";
+    };
+    
+    return "<error>";
+  };
+  
   //
   public int yypos() {
     return zzStartRead;
@@ -127,6 +142,9 @@ TIME_LIT = {TIME}{DAY}
 
 //
 %state YYSTRING
+%state YYSTRING2
+%state YYSTRING_INCOMPLETE
+%state YYSTRING_INCOMPLETE2
 
 %state YYTYPE
 %state YYSTRUCT
@@ -150,6 +168,30 @@ TIME_LIT = {TIME}{DAY}
 %state YYST
 
 %%
+
+<YYINITIAL> {
+  //
+  "ELSIF"              |
+  "ELSE"               |
+  "END_TYPE"           |
+  "END_STRUCT"         |
+  "END_VAR"            |
+  "END_FUNCTION"       |
+  "END_FUNCTION_BLOCK" |
+  "END_PROGRAM"        |
+  "END_STEP"           |
+  "END_TRANSITION"     |
+  "END_ACTION"         |
+  "END_CONFIGURATION"  |
+  "END_RESOURCE"       |
+  "END_IF"             |
+  "END_CASE"           |
+  "END_FOR"            |
+  "END_REPEAT"         |
+  "END_WHILE"          {
+    return token(KEYWORD.misspell());
+  }
+}
 
 <YYTYPE> {
   //
@@ -635,13 +677,26 @@ TIME_LIT = {TIME}{DAY}
   }
   
   //
-  "'"("$".|[^\'\r\n])*$ {
+  "'" / ("$".|[^\'\r\n])*$ {
+    yypush(YYSTRING_INCOMPLETE);
     return token(STRING_INCOMPLETE);
   }
   
   //
   "'" {
     yypush(YYSTRING);
+    return token(STRING);
+  }
+  
+  //
+  "\"" / ("$".|[^\"\r\n])*$ {
+    yypush(YYSTRING_INCOMPLETE2);
+    return token(STRING_INCOMPLETE);
+  }
+  
+  //
+  "\"" {
+    yypush(YYSTRING2);
     return token(STRING);
   }
   
@@ -781,12 +836,6 @@ TIME_LIT = {TIME}{DAY}
   "WORD"          |
   "DWORD"         |
   "LWORD"         |
-  "ANY"           |
-  "ANY_NUM"       |
-  "ANY_REAL"      |
-  "ANY_INT"       |
-  "ANY_BIT"       |
-  "ANY_DATE"      |
   "ARRAY"         |
   "OF"            |
   "R_EDGE"        |
@@ -815,6 +864,26 @@ TIME_LIT = {TIME}{DAY}
   "UNTIL"         |
   "EXIT"          {
     return token(KEYWORD);
+  }
+  
+  //
+  "SR"            |
+  "RS"            |
+  "TP"            |
+  "R_TRIG"        |
+  "F_TRIG"        |
+  "CTD"           |
+  "CTUD"          |
+  "CTU"           |
+  "TOF"           |
+  "TON"           |
+  "ANY"           |
+  "ANY_NUM"       |
+  "ANY_REAL"      |
+  "ANY_INT"       |
+  "ANY_BIT"       |
+  "ANY_DATE"      {
+    return token(STANDARD);
   }
   
   //
@@ -858,215 +927,6 @@ TIME_LIT = {TIME}{DAY}
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*<YYINITIAL> {
-  //
-  "//" {
-    return checkComment("//");
-  }
-  
-  //
-  "(*" {
-    return checkComment("(*", "*)");
-  }
-  
-  //
-  "TRUE"               |
-  "FALSE"              |
-  "TIME_OF_DAY"        |
-  "TOD"                |
-  "DATE"               |
-  "D"                  |
-  "DATE_AND_TIME"      |
-  "DT"                 |
-  "STRING"             |
-  "TIME"               |
-  "SINT"               |
-  "INT"                |
-  "DINT"               |
-  "LINT"               |
-  "USINT"              |
-  "UINT"               |
-  "UDINT"              |
-  "ULINT"              |
-  "REAL"               |
-  "LREAL"              |
-  "BOOL"               |
-  "BYTE"               |
-  "WORD"               |
-  "DWORD"              |
-  "LWORD"              |
-  "ANY"                |
-  "ANY_NUM"            |
-  "ANY_REAL"           |
-  "ANY_INT"            |
-  "ANY_BIT"            |
-  "ANY_DATE"           |
-  "TYPE"               |
-  "END_TYPE"           |
-  "ARRAY"              |
-  "OF"                 |
-  "STRUCT"             |
-  "END_STRUCT"         |
-  "VAR_INPUT"          |
-  "END_VAR"            |
-  "R_EDGE"             |
-  "F_EDGE"             |
-  "VAR_OUTPUT"         |
-  "RETAIN"             |
-  "VAR_IN_OUT"         |
-  "VAR"                |
-  "CONSTANT"           |
-  "VAR_EXTERNAL"       |
-  "VAR_GLOBAL"         |
-  "AT"                 |
-  "FUNCTION"           |
-  "END_FUNCTION"       |
-  "FUNCTION_BLOCK"     |
-  "END_FUNCTION_BLOCK" |
-  "PROGRAM"            |
-  "END_PROGRAM"        |
-  "VAR_ACCESS"         |
-  "INTIAL_STEP"        |
-  "END_STEP"           |
-  "TRANSITION"         |
-  "FROM"               |
-  "TO"                 |
-  "END_TRANSITION"     |
-  "ACTION"             |
-  "END_ACTION"         |
-  "CONFIGURATION"      |
-  "END_CONFIGURATION"  |
-  "RESOURCE"           |
-  "END_RESOURCE"       |
-  "READ_WRITE"         |
-  "READ_ONLY"          |
-  "TASK"               |
-  "SINGLE"             |
-  "INTERVAL"           |
-  "PRIORITY"           |
-  "WITH"               |
-  "OR"                 |
-  "XOR"                |
-  "AND"                |
-  "MOD"                |
-  "NOT"                |
-  "RETURN"             |
-  "IF"                 |
-  "THEN"               |
-  "ELSIF"              |
-  "ELSE"               |
-  "END_IF"             |
-  "CASE"               |
-  "END_CASE"           |
-  "FOR"                |
-  "DO"                 |
-  "END_FOR"            |
-  "BY"                 |
-  "WHILE"              |
-  "END_WHILE"          |
-  "REPEAT"             |
-  "UNTIL"              |
-  "END_REPEAT"         |
-  "EXIT"               {
-    return token(KEYWORD);
-  }
-  
-  //
-  "END_"?("UNION"|"CLASS") {
-    return token(IMPL_KEYWORD);
-  }
-  
-  //
-  [:jletter:][:jletterdigit:]* {
-    return token(IDENTIFIER);
-  }
-  
-  //
-  "%"[QIMqim][XBWDLxbwdl][:digit:]+              |
-  "%"[QIMqim][XBWDLxbwdl][:digit:]+"."[:digit:]+ |
-  "%"[Rr][XBWDLxbwdl][:digit:]+                  {
-    return token(SYMBOL);
-  }
-  
-  //
-  "%"[:jletterdigit:]* {
-    return token(SYMBOL.misspell());
-  }
-  
-  //
-  {INT}                                                                    |
-  {FIXED}                                                                  |
-  {TIME_LIT}                                                               |
-  ("TIME_OF_DAY"|"TOD")"#"{INT}":"{INT}":"{INT}                            |
-  ("TIME_OF_DAY"|"TOD")"#"{INT}":"{INT}":"{FIXED}                          |
-  ("DATE"|"D")"#"{INT}"-"{INT}"-"{INT}                                     |
-  ("DATE_AND_TIME"|"DT")"#"{INT}"-"{INT}"-"{INT}"-"{INT}":"{INT}":"{INT}   |
-  ("DATE_AND_TIME"|"DT")"#"{INT}"-"{INT}"-"{INT}"-"{INT}":"{INT}":"{FIXED} {
-    return token(NUMBER);
-  }
-  
-  //
-  ([:jletterdigit:]|_)*"#"([:jletterdigit:]|_|"."|":"|"-")+ |
-  ([:jletterdigit:]|_)+"#"([:jletterdigit:]|_|"."|":"|"-")* {
-    return token(NUMBER.misspell());
-  }
-  
-  //
-  "'"("$".|[^\'\\\r\n])*$ {
-    return token(STRING_INCOMPLETE);
-  }
-  
-  //
-  "'" {
-    yybegin(YYSTRING);
-    return token(STRING);
-  }
-  
-  //
-  [-+=<>?,.;:\^&|*]+ {
-    return token(PUNCTUATION);
-  }
-  
-  //
-  "(" {
-    return token(PUNCTUATION, +'(');
-  }
-  
-  //
-  ")" {
-    return token(PUNCTUATION, -'(');
-  }
-  
-  //
-  "[" {
-    return token(PUNCTUATION, +'[');
-  }
-  
-  //
-  "]" {
-    return token(PUNCTUATION, -'[');
-  }
-  
-  //
-  .|\r|\n {
-    return null;
-  }
-}*/
-
-
 <YYSTRING> {
   //
   "'" {
@@ -1076,13 +936,76 @@ TIME_LIT = {TIME}{DAY}
   
   //
   "$". {
-    out.printf("hmmm...%n");
     return token(STRING_ESCAPE);
   }
   
   //
   [^\'\$\r\n]+ {
     return token(STRING);
+  }
+}
+
+<YYSTRING_INCOMPLETE> {
+  //
+  "$"[^\r\n] {
+    return token(STRING_ESCAPE);
+  }
+  
+  //
+  "$" {
+    return token(STRING_ESCAPE);
+  }
+  
+  //
+  [^$\r\n]+ {
+    return token(STRING_INCOMPLETE);
+  }
+  
+  //
+  [\r\n] {
+    yypop();
+    return token(KEYWORD);
+  }
+}
+
+<YYSTRING2> {
+  //
+  "\"" {
+    yypop();
+    return token(STRING);
+  }
+  
+  //
+  "$". {
+    return token(STRING_ESCAPE);
+  }
+  
+  //
+  [^\"\$\r\n]+ {
+    return token(STRING);
+  }
+}
+
+<YYSTRING_INCOMPLETE2> {
+  //
+  "$"[^\r\n] {
+    return token(STRING_ESCAPE);
+  }
+  
+  //
+  "$" {
+    return token(STRING_ESCAPE);
+  }
+  
+  //
+  [^$\r\n]+ {
+    return token(STRING_INCOMPLETE);
+  }
+  
+  //
+  [\r\n] {
+    yypop();
+    return token(KEYWORD);
   }
 }
 

@@ -4,6 +4,7 @@
 * Author: Paulo H. "Taka" Torrens.                                             *
 * E-Mail: paulotorrens@ekolivre.com.br                                         *
 *                                                                              *
+* Copyright (C) Ekolivre TI, Paulo H. Torrens - 2013.                          *
 * Ekolivre TI (http://www.ekolivre.com.br) claims rights over this software;   *
 *   you may use for educational or personal uses. For comercial use (even as   *
 *   a library), please contact the author.                                     *

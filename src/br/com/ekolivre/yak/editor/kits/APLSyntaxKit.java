@@ -24,8 +24,71 @@
 * You should have received a copy of the GNU General Public License along with *
 *   YAK.  If not, see <http://www.gnu.org/licenses/>.                          *
 *******************************************************************************/
-package br.com.ekolivre.yak.editor;
+package br.com.ekolivre.yak.editor.kits;
 
-public class SyntaxKitAdapter {
+import java.util.*;
+import br.com.ekolivre.yak.editor.*;
+import static java.lang.System.*;
+import static java.util.Collections.*;
+import static br.com.ekolivre.yak.editor.TokenType.*;
+
+/**
+ *
+ */
+public class APLSyntaxKit extends NestableSyntaxKit {
+  /* */
+  public static final int AAA = 0x01;
   
+  //
+  @SuppressWarnings("unchecked")
+  private static final Map<Integer, String> dialects = 
+    unmodifiableMap(new HashMap() {{
+      put(AAA, "ASCII Annotation");
+    }});
+  
+  //
+  @SuppressWarnings("unchecked")
+  private static final Map<String, Integer> extensions_map =
+    unmodifiableMap(new HashMap() {{
+      put("aaa", AAA);
+    }});
+  
+  //
+  /*@Override
+  protected boolean isWordCharacter(char c) {
+    if(c == '$')
+      return true;
+    return super.isWordCharacter(c);
+  };*/
+  
+  //
+  @Override
+  protected final Token getToken(TokenState state) {
+    return null;
+  };
+  
+  @Override
+  public Map<Integer, String> getDialectList() {
+    return null;
+  };
+  
+  @Override
+  public int getDefaultDialect() {
+    return 0;
+  };
+  
+  @Override
+  public Map<String, Integer> getFileExtensions() {
+    return extensions_map;
+  };
+  
+  @Override
+  public String getContentType() {
+    return "text/x-apl";
+  };
+  
+  @Override
+  public String getKitName() {
+    return "APL";
+  };
 };

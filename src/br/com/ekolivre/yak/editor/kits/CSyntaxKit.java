@@ -4,6 +4,7 @@
 * Author: Paulo H. "Taka" Torrens.                                             *
 * E-Mail: paulotorrens@ekolivre.com.br                                         *
 *                                                                              *
+* Copyright (C) Ekolivre TI, Paulo H. Torrens - 2013.                          *
 * Ekolivre TI (http://www.ekolivre.com.br) claims rights over this software;   *
 *   you may use for educational or personal uses. For comercial use (even as   *
 *   a library), please contact the author.                                     *
@@ -44,6 +45,7 @@ public class CSyntaxKit extends NestableSyntaxKit {
   public static final int MSC = 0x10 | C11;
   public static final int GNU = 0x20 | C11;
   public static final int INO = 0x40 | GNU;
+  public static final int UPC = 0x80 | C11;
   
   /* */
   private static final int STATE_TOP =  0;
@@ -174,7 +176,6 @@ public class CSyntaxKit extends NestableSyntaxKit {
     "[^'\\\\%]+"
   );
   
-  
   //
   @SuppressWarnings("unchecked")
   private static final Map<Integer, String> dialects = 
@@ -186,6 +187,7 @@ public class CSyntaxKit extends NestableSyntaxKit {
       put(MSC, "Microsoft C");
       put(GNU, "GNU C");
       put(INO, "Arduino C");
+      put(UPC, "Unified Parallel C");
     }});
   
   //
@@ -201,6 +203,7 @@ public class CSyntaxKit extends NestableSyntaxKit {
       put("gnu", GNU);
       put("ino", INO);
       put("pde", INO);
+      put("upc", UPC);
     }});
   
   //

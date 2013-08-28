@@ -4,6 +4,7 @@
 * Author: Paulo H. "Taka" Torrens.                                             *
 * E-Mail: paulotorrens@ekolivre.com.br                                         *
 *                                                                              *
+* Copyright (C) Ekolivre TI, Paulo H. Torrens - 2013.                          *
 * Ekolivre TI (http://www.ekolivre.com.br) claims rights over this software;   *
 *   you may use for educational or personal uses. For comercial use (even as   *
 *   a library), please contact the author.                                     *
@@ -112,31 +113,13 @@ public class GuessMeSyntaxKit extends DefaultSyntaxKit {
       InputStream is = GuessMeSyntaxKit.class.getResourceAsStream(CLASSIFIER);
       ObjectInputStream ois = new ObjectInputStream(is);
       
-      langs = (LinkedHashMap<String, LinkedHashMap<String, Integer>>)ois.readObject();
+      langs = (LinkedHashMap)ois.readObject();
       sum = ois.readInt();
     } catch(Throwable t) {
       //
     };
     
   };
-  
-  //
-  public GuessMeSyntaxKit() {
-    
-  };
-  
-  /*//
-  @Override
-  protected final Token getToken(TokenState state) {
-    if(state instanceof GuessMeTokenState) {
-      return ((GuessMeTokenState)state).getChildToken();
-    };
-    // If we fall here, this means that we are at position 0... we then should
-    // generate a placeholder token (len: 0) with a detector thread; this way
-    // we may asynchronously keep trying to detect what language is being typed
-    return getPlaceholderToken();
-  };*/
-  
   
   @Override
   public final synchronized List<Token> parse(CharSequence s, int o, int l,
@@ -182,7 +165,9 @@ public class GuessMeSyntaxKit extends DefaultSyntaxKit {
     
   };
   
-  //
+  /**
+   *
+   */
   private Reader getReader(CharSequence seq, int length) {
     
     // Check only the first 10kb of code
@@ -203,20 +188,18 @@ public class GuessMeSyntaxKit extends DefaultSyntaxKit {
                                   final String detector[]) {
     return new Thread(() -> {
       try {
-        // Sleep for 4 seconds
-        Thread.sleep(4000000);
+        // Sleep for a while... zzz...
+        Thread.sleep(2000000);
         
+        // Detect the mime and change it!
         String mime = detectMimeType(reader);
-        
         synchronized(detector) {
           detector[0] = mime;
         };
         
-        
       } catch(InterruptedException e) {
-        //
-      } finally {
-        
+        // Simply ignore
+        return;
       };
     });
   };
@@ -248,6 +231,7 @@ public class GuessMeSyntaxKit extends DefaultSyntaxKit {
   //
   @Override
   public String getContentType() {
+    // Arbitrary source code! :)
     return "text/x-source-code";
   };
   
