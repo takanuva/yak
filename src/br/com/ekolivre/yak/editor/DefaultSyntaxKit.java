@@ -36,9 +36,11 @@ import java.util.jar.*;
 import java.awt.event.*;
 import javax.swing.text.*;
 import javax.swing.event.*;
+import br.com.ekolivre.yak.editor.actions.*;
 import static java.lang.System.*;
 import static java.util.Collections.*;
 import static java.awt.event.KeyEvent.*;
+import static javax.swing.SwingConstants.*;
 
 /**
  * This is the base class used for handling tokenized text files. Children will
@@ -152,6 +154,21 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
     this.editor = editor;
     
     //lines = new LineNumberPanel(editor);
+    
+    
+    
+    
+    JPopupMenu menu = new JPopupMenu();
+    
+    populate(menu);
+    
+    menu.pack();
+    
+    editor.setComponentPopupMenu(menu);
+    
+    
+    
+    
     
   };
   
@@ -353,6 +370,23 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
    * @param c The component to add the items.
    */
   public void populate(JComponent c) {
+    addAction(c, new UndoRedoAction());
+  };
+  
+  private void addAction(JComponent c, AbstractEditorAction a) {
+    
+    JComponent children[] = a.makeComponents();
+    if(children != null)
+      for(JComponent x: children)
+        if(c instanceof JPopupMenu && x instanceof JButton) {
+          JButton b = (JButton)x;
+          
+          b.setText(b.getToolTipText());
+          b.setToolTipText("");
+          
+          c.add(b);
+          
+        } else c.add(x);
     
   };
   

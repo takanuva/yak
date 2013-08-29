@@ -125,6 +125,7 @@ public final class Main extends JFrame {
   
   private void init() {
     //
+    System.setProperty("file.encoding", "UTF-8");
     System.setProperty("apple.laf.useScreenMenuBar", "true");
     System.setProperty("com.apple.mrj.application.apple.menu.about.name",
                        getAppName());
@@ -365,6 +366,8 @@ public final class Main extends JFrame {
                                       this::saveActiveTab));
       //appendAction(new PrintFileAction(this::printActiveTab));
       
+      appendAction(new ExportToHTMLAction(kit));
+      
       appendSeparator();
       
       kit.populate(toolbar);
@@ -497,6 +500,9 @@ public final class Main extends JFrame {
       
     };
     
+    void setTitle(String title) {
+      label.setText(title);
+    };
     
   };
   
@@ -594,14 +600,21 @@ public final class Main extends JFrame {
   };
   
   private void saveActiveTab(File file) {
-    out.printf("saving active tab on [%s]%n", file.getAbsolutePath());
-    
     int i = tabs.getSelectedIndex();
     
-    JScrollPane scroll = (JScrollPane)tabs.getComponentAt(i);
-    JEditorPane editor = (JEditorPane)scroll.getViewport().getView();
-    
-    tabs.setTitleAt(i, file.getName());
+    try { 
+      JScrollPane scroll = (JScrollPane)tabs.getComponentAt(i);
+      JEditorPane editor = (JEditorPane)scroll.getViewport().getView();
+      
+      TabComponent c = (TabComponent)tabs.getTabComponentAt(i);
+      
+      hash.put(editor, file);
+      
+      c.setTitle(file.getName());
+      
+    } catch(Throwable t) {
+      t.printStackTrace();
+    };
     
   };
   

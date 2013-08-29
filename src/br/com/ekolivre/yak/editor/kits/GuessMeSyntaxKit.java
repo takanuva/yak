@@ -171,8 +171,8 @@ public class GuessMeSyntaxKit extends DefaultSyntaxKit {
   private Reader getReader(CharSequence seq, int length) {
     
     // Check only the first 10kb of code
-    int limit = 10240;
-    if(limit > length)
+    final int limit = 10240;
+    if(length > limit)
       length = limit;
     
     if(seq instanceof Segment) {

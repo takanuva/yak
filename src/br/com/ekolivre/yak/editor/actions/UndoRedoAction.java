@@ -34,8 +34,8 @@ public class UndoRedoAction extends AbstractEditorAction {
   @Override
   protected JComponent makeComponents()[] {
     return new JComponent[] {
-      makeButton("icons/edit-undo.png"),
-      makeButton("icons/edit-redo.png")
+      makeButton("icons/edit-undo.png", "Undo..."),
+      makeButton("icons/edit-redo.png", "Redo...")
     };
   };
 };

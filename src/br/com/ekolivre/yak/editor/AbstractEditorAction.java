@@ -47,19 +47,19 @@ public abstract class AbstractEditorAction {
     return components;
   };
   
-  protected JButton makeButton(String icon) {
+  protected JButton makeButton(String icon, String desc) {
     JButton res = new JButton();
-    setIconForButton(res, icon);
+    setIconForButton(res, icon, desc);
     return res;
   };
   
-  protected JButton makeButton(String icon, Callback callback) {
-    JButton res = makeButton(icon);
+  protected JButton makeButton(String icon, String desc, Callback callback) {
+    JButton res = makeButton(icon, desc);
     res.addActionListener(e -> callback.run());
     return res;
   };
   
-  private void setIconForButton(JButton button, String icon) {
+  private void setIconForButton(JButton button, String icon, String desc) {
     try {
       URL url = ClassLoader.getSystemClassLoader().getResource(icon);
       
@@ -67,6 +67,8 @@ public abstract class AbstractEditorAction {
       button.setContentAreaFilled(false);
       
       button.setIcon(new ImageIcon(url));
+      
+      button.setToolTipText(desc);
       
     } catch(Throwable t) {
       out.printf("fail: %s%n", t);

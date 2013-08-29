@@ -80,7 +80,7 @@ public class OpenFileAction extends AbstractEditorAction {
   @Override
   protected JComponent makeComponents()[] {
     return new JComponent[] {
-      makeButton("icons/document-open.png", () -> {
+      makeButton("icons/document-open.png", "Open file...", () -> {
         int ret = chooser.showOpenDialog(frame);
         if(ret == JFileChooser.APPROVE_OPTION) {
           for(File file: chooser.getSelectedFiles())

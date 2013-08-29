@@ -31,17 +31,20 @@ import java.awt.*;
 import javax.swing.*;
 import br.com.ekolivre.yak.editor.*;
 
-public class ConfigAction extends AbstractEditorAction {
-  private Callback callback;
+public class ExportToHTMLAction extends AbstractEditorAction {
+  //
+  private DefaultSyntaxKit kit;
   
-  public ConfigAction(Callback callback) {
-    this.callback = callback;
+  public ExportToHTMLAction(DefaultSyntaxKit kit) {
+    this.kit = kit;
   };
   
   @Override
   protected JComponent makeComponents()[] {
     return new JComponent[] {
-      makeButton("icons/preferences-system.png", "Preferences...", callback)
+      makeButton("icons/code-to-html.png", "Export code to HTML...", () -> {
+        
+      })
     };
   };
   

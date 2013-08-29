@@ -41,7 +41,7 @@ public class PrintFileAction extends AbstractEditorAction {
   @Override
   protected JComponent makeComponents()[] {
     return new JComponent[] {
-      makeButton("icons/document-print.png", callback)
+      makeButton("icons/document-print.png", "Print file...", callback)
     };
   };
   

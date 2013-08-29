@@ -41,7 +41,7 @@ public class NewFileAction extends AbstractEditorAction {
   @Override
   protected JComponent makeComponents()[] {
     return new JComponent[] {
-      makeButton("icons/document-new.png", callback)
+      makeButton("icons/document-new.png", "New file...", callback)
     };
   };
   

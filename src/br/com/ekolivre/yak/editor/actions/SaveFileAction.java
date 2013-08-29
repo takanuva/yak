@@ -84,7 +84,7 @@ public class SaveFileAction extends AbstractEditorAction {
   @Override
   protected JComponent makeComponents()[] {
     return new JComponent[] {
-      makeButton("icons/document-save.png", () -> {
+      makeButton("icons/document-save.png", "Save file...", () -> {
         if(file == null) {
           //
           int ret = chooser.showSaveDialog(frame);
@@ -94,7 +94,7 @@ public class SaveFileAction extends AbstractEditorAction {
           };
         } else callback.run(file);
       }),
-      makeButton("icons/document-save-as.png", () -> {
+      makeButton("icons/document-save-as.png", "Save file as...", () -> {
         //
         int ret = chooser.showSaveDialog(frame);
         if(ret == JFileChooser.APPROVE_OPTION) {
