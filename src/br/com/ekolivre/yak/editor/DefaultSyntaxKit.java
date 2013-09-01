@@ -153,11 +153,6 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
     
     this.editor = editor;
     
-    //lines = new LineNumberPanel(editor);
-    
-    
-    
-    
     JPopupMenu menu = new JPopupMenu();
     
     populate(menu);
@@ -165,10 +160,6 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
     menu.pack();
     
     editor.setComponentPopupMenu(menu);
-    
-    
-    
-    
     
   };
   
@@ -373,12 +364,16 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
     addAction(c, new UndoRedoAction());
   };
   
+  /**
+   *
+   */
   private void addAction(JComponent c, AbstractEditorAction a) {
     
     JComponent children[] = a.makeComponents();
     if(children != null)
       for(JComponent x: children)
         if(c instanceof JPopupMenu && x instanceof JButton) {
+          
           JButton b = (JButton)x;
           
           b.setText(b.getToolTipText());
@@ -390,13 +385,16 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
     
   };
   
+  /**
+   *
+   */
   public void getDisplayText(int pos, int len, Segment seg)
   throws BadLocationException {
     getDocument().getText(pos, len, seg);
   };
   
   @Override
-  public String toString() {
+  public final String toString() {
     return getKitName();
   };
   
@@ -442,6 +440,7 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
         "font-family: monospaced;",
         html);
     } catch(FileNotFoundException e) {
+      err.printf("file not found: %s%n", file);
       exit(-1);
     };
     

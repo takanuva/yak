@@ -127,12 +127,20 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   };
   
   //
+  private Token adequateToken() {
+    return adequateToken(getActiveContext());
+  };
+  
+  //
   private Token adequateToken(Context context) {
-    if(context.bold && context.italic)
+    
+    Context active = getActiveContext();
+    
+    if(active.bold && active.italic)
       return token(DEFAULT_BOLD_ITALIC, context);
-    else if(context.bold)
+    else if(active.bold)
       return token(DEFAULT_BOLD, context);
-    else if(context.italic)
+    else if(active.italic)
       return token(DEFAULT_ITALIC, context);
     else
       return token(DEFAULT, context);
@@ -146,9 +154,22 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
 
 %%
 
-/*" _ " {
-  return token(DEFAULT);
-}*/
+/*"____"+ {
+  return adequateToken();
+}
+
+"___" {
+  Context context = getActiveContext();
+  context.bold = !context.bold;
+  context.italic = !context.italic;
+  return adequateToken(context);
+}
+
+"__" {
+  Context context = getActiveContext();
+  context.bold = !context.bold;
+  return adequateToken(context);
+}
 
 "_" {
   Context context = getActiveContext();
@@ -157,8 +178,8 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
 }
 
 [^ \t] {
-  return adequateToken(getActiveContext());
-}
+  return adequateToken();
+}*/
 
 .|\r|\n {
   return null;

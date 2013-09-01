@@ -37,6 +37,7 @@ public class PlainTextKit extends DefaultSyntaxKit {
   private static final Map<String, Integer> extensions_map =
     unmodifiableMap(new HashMap() {{
       put("txt", null);
+      put("TXT", null);
     }});
   
   @Override

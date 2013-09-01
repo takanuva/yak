@@ -99,7 +99,9 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
 %state YYIMPORT3
 %state YYCLASS
 %state YYSTRING
+%state YYSTRING_INCOMPLETE
 %state YYCHARACTER
+%state YYCHARACTER_INCOMPLETE
 
 %%
 
@@ -379,25 +381,15 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   }
   
   //
-  "\""("\\".|[^\"\\\r\n])*$ {
+  "\"" / ("\\".|"\\"[\r][\n]?|"\\"[\n]|[^\"\\\r\n])*$ {
+    yypush(YYSTRING_INCOMPLETE);
     return token(STRING_INCOMPLETE);
   }
   
   //
   "\"" {
-    yybegin(YYSTRING);
+    yypush(YYSTRING);
     return token(STRING);
-  }
-  
-  //
-  "'"("\\".|[^\'\\\r\n])*$ {
-    return token(CHARACTER_INCOMPLETE);
-  }
-  
-  //
-  "'" {
-    yybegin(YYCHARACTER);
-    return token(CHARACTER);
   }
   
   //
@@ -436,7 +428,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   }
 }
 
-<YYSTRING> {
+/*<YYSTRING> {
   //
   "\"" {
     yybegin(YYCLASS);
@@ -475,7 +467,67 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   [^\'\\\r\n]+ {
     return token(CHARACTER);
   }
+}*/
+
+
+
+
+
+
+
+
+
+<YYSTRING> {
+  //
+  "\"" {
+    yypop();
+    return token(STRING);
+  }
+  
+  //
+  "\\".|"\\"\r\n?|"\\"\n {
+    return token(STRING_ESCAPE);
+  }
+  
+  //
+  [^\"\$\r\n]+ {
+    return token(STRING);
+  }
 }
+
+<YYSTRING_INCOMPLETE> {
+  //
+  "\\"[^\r\n] {
+    return token(STRING_ESCAPE);
+  }
+  
+  //
+  "\\"\r\n?|"\\"\n {
+    return token(STRING_ESCAPE);
+  }
+  
+  //
+  "\\" {
+    return token(STRING_ESCAPE);
+  }
+  
+  //
+  [^\\\r\n]+ {
+    return token(STRING_INCOMPLETE);
+  }
+  
+  //
+  [\r\n] {
+    yypop();
+    return token(DEFAULT);
+  }
+}
+
+
+
+
+
+
 
 .|\r|\n {
   return null;

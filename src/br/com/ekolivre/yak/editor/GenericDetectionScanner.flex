@@ -208,8 +208,8 @@ import static java.util.Collections.*;
 <YYINITIAL> {
   // A shebang line! :3
   "#!".*[\r\n] {
-    //out.printf("We got a shebang!!!%n");
-    keepTrack();
+    for(int i = 0; i < 5; i++)
+      keepTrack();
   }
   
   // We didn't get a shebang, just tokenize the remaining file
@@ -220,7 +220,6 @@ import static java.util.Collections.*;
 }
 
 <YYNOT_SOF> {
-  
   // Skip newlines
   (" "|\t|\n|\r)+ {
     // Ignore
@@ -235,7 +234,7 @@ import static java.util.Collections.*;
   "<![CDATA[" ~"]]>" |
   "=begin" ~"=end"   |
   ^"=" ~[\r\n]"=cut" |
-  "#" ~[\r\n]        |
+//"#" ~[\r\n]        |
   "DNL" ~[\r\n]      |
   "REM" ~[\r\n]      {
     // Ignore
@@ -303,8 +302,13 @@ import static java.util.Collections.*;
   "<"([:jletterdigit:]|[\.\\/])+">" |
   "#"[:jletter:]+                   |
   [:letter:]+"#"[:letter:]*         |
-  [:letter:]*"#"[:letter:]+         |
+  [:letter:]*"#"[:letter:]+         {
+    keepTrack();
+  }
+  
+  //
   ([:letter:]|[:digit:]|[_\-@$:])+  {
+    // TODO: verify if this is a keyword or standard function on any language
     keepTrack();
   }
   

@@ -113,9 +113,11 @@ public final class Main extends JFrame {
     //openFile(new File("test.lsp"));
     //openFile(new File("test.psy"));
     //openFile(new File("test.jav"));
-    openFile(new File("test.plc"));
+    //openFile(new File("test.plc"));
     //openFile(new File("test.prg"));
     //openUntitledFile("text/x-source-code");
+    
+    openUntitledFile("text/x-markdown");
     
     //openFile(new File("bys/x-csharp/add.cs"));
     //openFile(new File("bys/x-csharp/getset.cs"));

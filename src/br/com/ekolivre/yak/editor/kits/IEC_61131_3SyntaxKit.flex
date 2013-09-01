@@ -964,7 +964,7 @@ TIME_LIT = {TIME}{DAY}
   //
   [\r\n] {
     yypop();
-    return token(KEYWORD);
+    return token(DEFAULT);
   }
 }
 
@@ -1005,7 +1005,7 @@ TIME_LIT = {TIME}{DAY}
   //
   [\r\n] {
     yypop();
-    return token(KEYWORD);
+    return token(DEFAULT);
   }
 }
 

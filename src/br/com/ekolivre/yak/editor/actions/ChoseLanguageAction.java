@@ -26,6 +26,8 @@
 *******************************************************************************/
 package br.com.ekolivre.yak.editor.actions;
 
+import java.io.*;
+import java.net.*;
 import java.util.*;
 import javax.swing.*;
 import java.awt.Component;
@@ -110,6 +112,34 @@ public class ChoseLanguageAction extends AbstractEditorAction {
         dilectBoxAddCallback(dialect_box);
       };
       
+    });
+    
+    //
+    box.setRenderer(new ListCellRenderer<DefaultSyntaxKit>() {
+      public Component getListCellRendererComponent(JList list,
+                                                    DefaultSyntaxKit value,
+                                                    int index,
+                                                    boolean isSelected,
+                                                    boolean cellHasFocus) {
+        
+        JLabel label = new JLabel();
+        label.setOpaque(true);
+        label.setText(value.toString());
+        
+        String path = "icons/" + value.getContentType() + ".png";
+        
+        try {
+          URL url = ClassLoader.getSystemClassLoader().getResource(path);
+          
+          ImageIcon ii = new ImageIcon(url);
+          
+          label.setIcon(ii);
+        } catch(Throwable t) {
+          // nothing :)
+        };
+        
+        return label;
+      };
     });
     
     //
