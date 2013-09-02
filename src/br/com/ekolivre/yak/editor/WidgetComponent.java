@@ -142,22 +142,27 @@ public class WidgetComponent extends JComponent {
       
       Component c = e.getComponent();
       
+      Point p = e.getPoint();
+      
       int w = c.getWidth();
       int h = c.getHeight();
       
       Rectangle r = new Rectangle(0, 0, w, h);
       
-      if(!r.contains(e.getPoint()))
+      if(!r.contains(p))
         return Cursor.DEFAULT_CURSOR;
       
       Rectangle a = new Rectangle(distance, distance, w - 2 * distance,
                                   h - 2 * distance);
-      if(a.contains(e.getPoint()))
+      if(a.contains(p))
         return Cursor.DEFAULT_CURSOR;
       
       
-      
-      
+      for(int i = 0; i < locations.length - 2; i++) {
+        Rectangle x = getRect(0, 0, w, h, locations[i]);
+        if(x.contains(p))
+          return cursors[i];
+      };
       
       return Cursor.MOVE_CURSOR;
     };

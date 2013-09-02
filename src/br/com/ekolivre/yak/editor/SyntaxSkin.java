@@ -27,6 +27,7 @@
 package br.com.ekolivre.yak.editor;
 
 import java.awt.*;
+import java.net.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.text.*;
@@ -292,12 +293,20 @@ public abstract class SyntaxSkin {
   
   public static final SyntaxSkin PUSHEEN = new SyntaxSkin() {
     
+    private final URL url = ClassLoader.getSystemClassLoader().getResource(
+      "pusheen.png"
+    );
+    private final Image pusheen = Toolkit.getDefaultToolkit().getImage(url);;
+    
+    private final int pusheen_w = 724;
+    private final int pusheen_h = 362;
+    
     private final int SIDE_SIZE = 11;
-    private final Color SIDE_COLOR = new Color(0xEDEDED);
-    private final Color BACK_COLOR = new Color(0xBEBEBE);
+    private final Color SIDE_COLOR = new Color(0xf9dec2);
+    private final Color BACK_COLOR = new Color(0xf9cea2);
     private final Color LINE_COLOR = new Color(0x000000);
     private final Color FONT_COLOR = new Color(0x000000);
-    private final Color AREA_COLOR = new Color(0x99BBFF);
+    private final Color AREA_COLOR = new Color(0xEEAE7E);
     private final Color WHSP_COLOR = new Color(0xCCCCCC);
     
     private final int INSET = 15;
@@ -324,6 +333,26 @@ public abstract class SyntaxSkin {
       g.fillRect(w, 0, SIDE_SIZE, h);
       g.setColor(BACK_COLOR);
       g.fillRect(0, 0, w, h);
+      
+      drawPusheen(g, w + SIDE_SIZE);
+      
+    };
+    
+    public void drawPusheen(Graphics g, int offset) {
+      
+      Rectangle r = g.getClipBounds();
+      
+      // Smallest x that is a multiple of pusheen_w and smaller than r.x
+      int bx = (r.x / pusheen_w) * pusheen_w + offset;
+      int by = (r.y / pusheen_h) * pusheen_h;
+      
+      for(int y = 0; by + y < r.y + r.height; y += pusheen_h) {
+        for(int x = 0; bx + x < r.x + r.width; x += pusheen_w) {
+          
+          g.drawImage(pusheen, bx + x, by + y, null);
+          
+        };
+      };
       
     };
     
@@ -388,78 +417,11 @@ public abstract class SyntaxSkin {
       int a = m.getAscent();
       int h = a + m.getDescent();
       
-      
       return x + Utilities.getTabbedTextWidth(s, m, x, e, 0);
-      /*
-      //
-      //int w = Utilities.getTabbedTextWidth(s, m, x, e, 0);
-      int w = m.charWidth(' ');
-      
-      //
-      g.setColor(WHSP_COLOR);
-      
-      //
-      int z = w / 4;
-      
-      //
-      for(int i = 0; i < s.count; i++) {
-        char c = s.array[s.offset + i];
-        
-        switch(c) {
-          case ' ': {
-            //
-            g.fillOval(x + (w - z * 2) / 2, y - (h / 2 - z), z * 2, z * 2);
-            
-            x += w;
-          } break;
-          case '\t': {
-            //
-            int p = (int)e.nextTabStop(x, 0) - x;
-            
-            assert p % w == 0;
-            
-            if(p == w) {
-              //
-              g.fillRect(x + 2, y - (h / 2 - z / 2), w - 4, z);
-              g.fillRect(x + (w - z) / 2, y - a + 2, z, h - 4);
-              
-              x += w;
-            } else {
-              //
-              g.fillRect(x + 3, y - (h / 2 - z / 2), w - 3, z);
-              
-              p -= w;
-              x += w;
-              
-              while(p > w) {
-                //
-                g.fillRect(x, y - (h / 2 - z / 2), w, z);
-                
-                p -= w;
-                x += w;
-              };
-              
-              //
-              g.fillRect(x, y - (h / 2 - z / 2), w - 2, z);
-              g.fillRect(x + (w - z) / 2, y - a + 2, z, h - 4);
-              
-              p -= w;
-              x += w;
-            };
-            
-          } break;
-        
-          default: assert false;
-        };
-      };
-      
-      
-      //
-      return x;*/
     };
   };
   
-  protected int numberOfGutterDigits(SyntaxView v) {
+  protected final int numberOfGutterDigits(SyntaxView v) {
     return Integer.toString(v.getNumberOfLines()).length();
   };
   
