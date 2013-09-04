@@ -53,7 +53,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   //
   @SuppressWarnings("unchecked")
   private static final Map<Integer, String> dialects = 
-    unmodifiableMap(new HashMap() {{
+    unmodifiableMap(new TreeMap() {{
       put(ST,  "Structured Text");
       put(IL,  "Instruction List");
       //put(SFC, "Sequential Function Chart");
@@ -63,7 +63,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   //
   @SuppressWarnings("unchecked")
   private static final Map<String, Integer> extensions_map =
-    unmodifiableMap(new HashMap() {{
+    unmodifiableMap(new TreeMap() {{
       put("iec", ALL);
       put("scl", ALL);
       put("plc", ALL);

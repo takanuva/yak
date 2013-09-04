@@ -42,14 +42,14 @@ public class APLSyntaxKit extends NestableSyntaxKit {
   //
   @SuppressWarnings("unchecked")
   private static final Map<Integer, String> dialects = 
-    unmodifiableMap(new HashMap() {{
+    unmodifiableMap(new TreeMap() {{
       put(AAA, "ASCII Annotation");
     }});
   
   //
   @SuppressWarnings("unchecked")
   private static final Map<String, Integer> extensions_map =
-    unmodifiableMap(new HashMap() {{
+    unmodifiableMap(new TreeMap() {{
       put("aaa", AAA);
     }});
   

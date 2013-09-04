@@ -46,19 +46,20 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
 
 %{
   //
-  public static final int KRC = 0x01;
-  public static final int C89 = 0x02;
-  public static final int C99 = 0x04;
-  public static final int C11 = 0x08;
-  public static final int MSC = 0x10 | C11;
-  public static final int GNU = 0x20 | C11;
-  public static final int INO = 0x40 | GNU;
-  public static final int UPC = 0x80 | C11;
+  public static final int KRC =  0x01;
+  public static final int C89 =  0x02 | KRC;
+  public static final int NA1 =  0x04 | C89;
+  public static final int C99 =  0x08 | NA1;
+  public static final int C11 =  0x10 | C99;
+  public static final int MSC =  0x20 | C11;
+  public static final int GNU =  0x40 | C11;
+  public static final int INO =  0x80 | GNU;
+  public static final int UPC = 0x100 | GNU;
   
   //
   @SuppressWarnings("unchecked")
   private static final Map<Integer, String> dialects = 
-    unmodifiableMap(new HashMap() {{
+    unmodifiableMap(new TreeMap() {{
       put(KRC, "Old-Style K&R C");
       put(C89, "ANSI/ISO C 89");
       put(C99, "ANSI/ISO C 99");
@@ -72,7 +73,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   //
   @SuppressWarnings("unchecked")
   private static final Map<String, Integer> extensions_map =
-    unmodifiableMap(new HashMap() {{
+    unmodifiableMap(new TreeMap() {{
       put("c",   C11);
       put("krc", KRC);
       put("c89", C89);
@@ -126,17 +127,32 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   };
 %}
 
+x = [diouxX]
+N = [:digit:]+
+
+%state YYPREPROC_COMMENT
 %state YYPREPROCESSOR
+%state YYPREPROCESSOR2
 %state YYINCLUDE
+%state YYINCLUDE_QUOTE
+%state YYINCLUDE_ANGLE
 
 %%
 
-^[\ \s]*"#" {
-  yybegin(YYPREPROCESSOR);
-  return token(PREPROCESSOR);
-}
-
 <YYINITIAL> {
+  //
+  ^[\ \s]*"#" {
+    yybegin(YYPREPROCESSOR);
+    return token(PREPROCESSOR);
+  }
+  
+  //
+  ^[\ \s]*"#"[\ \s]*"if"[\ \s]*"0"x?"0"*[\ \s]*$ {
+    yybegin(YYPREPROC_COMMENT);
+    return token(HEREDOC_COMMENT);
+  }
+  
+  //
   "auto"     |
   "break"    |
   "case"     |
@@ -172,8 +188,294 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
     return token(KEYWORD);
   }
   
+  //
+  "__LINE__" |
+  "__FILE__" |
+  "__func__" {
+    if(getDialect() >= C99)
+      return token(STANDARD);
+  }
+  
+  //
+  "__attribute__"       |
+  "__FUNCTION__"        |
+  "__PRETTY_FUNCTION__" {
+    if((getDialect() & GNU) == GNU)
+      return token(KEYWORD);
+  }
+  
+  //
+  "__declspec"   |
+  "__FUNCTION__" |
+  "__FUNCSIG__"  {
+    if((getDialect() & MSC) == MSC)
+      return token(KEYWORD);
+  }
+  
+  // assert.h
+  "NDEBUG" |
+  "assert" {
+    return token(STANDARD);
+  }
+  
+  // ctype.h
+  "isalnum"  |
+  "isalpha"  |
+  "iscntrl"  |
+  "isdigit"  |
+  "isgraph"  |
+  "islower"  |
+  "isprint"  |
+  "ispunct"  |
+  "isspace"  |
+  "isupper"  |
+  "isxdigit" |
+  "tolower"  |
+  "toupper"  {
+    return token(STANDARD);
+  }
+  
+  // ctype.h - C11
+  "isblank" {
+    if(getDialect() >= C11)
+      return token(STANDARD);
+  }
+  
+  // errno.h (variables)
+  "errno" {
+    return token(STANDARD);
+  }
+  
+  // fenv.h - C99
+  "feclearexcept"   |
+  "feraiseexcept"   |
+  "fegetexceptflag" |
+  "fesetexceptflag" |
+  "fegetround"      |
+  "fesetround"      |
+  "fegetenv"        |
+  "fesetenv"        |
+  "feholdexcept"    |
+  "feupdateenv"     |
+  "fenv_t"          |
+  "fexcept_t"       {
+    if(getDialect() >= C99)
+      return token(STANDARD);
+  }
+  
+  // float.h
+  "FLT_RADIX"       |
+  "FLT_MANT_DIG"    |
+  "DBL_MANT_DIG"    |
+  "LDBL_MANT_DIG"   |
+  "FLT_DIG"         |
+  "DBL_DIG"         |
+  "LDBL_DIG"        |
+  "FLT_MIN_EXP"     |
+  "DBL_MIN_EXP"     |
+  "LDBL_MIN_EXP"    |
+  "FLT_MIN_10_EXP"  |
+  "DBL_MAX_10_EXP"  |
+  "LDBL_MAX_10_EXP" |
+  "FLT_MAX"         |
+  "DBL_MAX"         |
+  "LDBL_MAX"        |
+  "FLT_EPSILON"     |
+  "DBL_EPSILON"     |
+  "LDBL_EPSILON"    |
+  "FLT_MIN"         |
+  "DBL_MIN"         |
+  "LDBL_MIN"        |
+  "FLT_ROUNDS"      {
+    return token(STANDARD);
+  }
+  
+  // float.h - C99
+  "FLT_EVAL_METHOD" |
+  "DECIMAL_DIG"     {
+    if(getDialect() >= C99)
+      return token(STANDARD);
+  }
+  
+  // inttypes.h - C99
+  PRI{x}MAX      |
+  PRI{x}{N}      |
+  PRI{x}LEAST{N} |
+  PRI{x}FAST{N}  |
+  PRI{x}PTR      |
+  SCN{x}MAX      |
+  SCN{x}{N}      |
+  SCN{x}LEAST{N} |
+  SCN{x}FAST{N}  |
+  SCN{x}PTR      {
+    if(getDialect() >= C99)
+      return token(STANDARD);
+  }
+  
+  // iso646.h - NA1
+  "and"    |
+  "and_eq" |
+  "bitand" |
+  "bitor"  |
+  "compl"  |
+  "not"    |
+  "not_eq" |
+  "or"     |
+  "or_eq"  |
+  "xor"    |
+  "xor_eq" {
+    if(getDialect() >= NA1)
+      return token(STANDARD);
+  }
+  
+  // limits.h
+  "CHAR_BIT"   |
+  "SCHAR_MIN"  |
+  "SCHAR_MAX"  |
+  "UCHAR_MAX"  |
+  "CHAR_MIN"   |
+  "CHAR_MAX"   |
+  "MB_LEN_MAX" |
+  "SHRT_MIN"   |
+  "SHRT_MAX"   |
+  "USHRT_MAX"  |
+  "INT_MIN"    |
+  "INT_MAX"    |
+  "UINT_MAX"   |
+  "LONG_MIN"   |
+  "LONG_MAX"   |
+  "ULONG_MAX"  {
+    return token(STANDARD);
+  }
+  
+  "LLONG_MIN"  |
+  "LLONG_MAX"  |
+  "ULLONG_MAX" {
+    if(getDialect() >= C99)
+      return token(STANDARD);
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  u?"int"{N}"_t" {
+    return token(STANDARD);
+  }
+  
+  //
   [:jletter:][:jletterdigit:]* {
     return token(IDENTIFIER);
+  }
+}
+
+<YYPREPROCESSOR> {
+  "pragma"   |
+  "define"   |
+  "ifdef"    |
+  "ifndef"   |
+  "if"       |
+  "else"     |
+  "undef"    |
+  "assert"   |
+  "line"     |
+  "unassert" {
+    yybegin(YYPREPROCESSOR2);
+    return token(PREPROCESSOR_KEYWORD);
+  }
+  
+  "include"      |
+  "import"       {
+    yybegin(YYINCLUDE);
+    return token(PREPROCESSOR_KEYWORD);
+  }
+  
+  "include_next" {
+    if((getDialect() & GNU) == GNU) {
+      yybegin(YYINCLUDE);
+      return token(PREPROCESSOR_KEYWORD);
+    };
+  }
+  
+  [^\ \t\r\n]+ {
+    yybegin(YYPREPROCESSOR2);
+    return token(PREPROCESSOR_KEYWORD.misspell());
+  }
+  
+}
+
+<YYPREPROCESSOR2> {
+  [^\ \t\r\n]+ {
+    return token(PREPROCESSOR);
+  }
+}
+
+<YYINCLUDE> {
+  "\"" {
+    yybegin(YYINCLUDE_QUOTE);
+    return token(PREPROCESSOR_STRING);
+  }
+  
+  "<" {
+    yybegin(YYINCLUDE_ANGLE);
+    return token(PREPROCESSOR_STRING);
+  }
+  
+  . {
+    yypushback(1);
+    yybegin(YYPREPROCESSOR2);
+    return token(DEFAULT);
+  }
+}
+
+<YYPREPROCESSOR,YYPREPROCESSOR2,YYINCLUDE,YYINCLUDE_QUOTE,YYINCLUDE_ANGLE> {
+  [\r\n] {
+    yypushback(1);
+    yybegin(YYINITIAL);
+    return token(DEFAULT);
+  }
+}
+
+<YYPREPROC_COMMENT> {
+  ^[\ \s]*"#"[\ \s]*"endif"[\ \t].*$ {
+    yybegin(YYINITIAL);
+    return token(HEREDOC_COMMENT);
+  }
+  
+  [^\ \t\r\n]+ {
+    return token(HEREDOC_COMMENT);
+  }
+}
+
+<YYINCLUDE_QUOTE> {
+  "\"" {
+    yybegin(YYPREPROCESSOR2);
+    return token(PREPROCESSOR_STRING);
+  }
+  
+  [^\"]+ {
+    return token(PREPROCESSOR_STRING);
+  }
+}
+
+<YYINCLUDE_ANGLE> {
+  ">" {
+    yybegin(YYPREPROCESSOR2);
+    return token(PREPROCESSOR_STRING);
+  }
+  
+  [^\>]+ {
+    return token(PREPROCESSOR_STRING);
   }
 }
 

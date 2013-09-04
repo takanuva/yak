@@ -66,7 +66,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   //
   @SuppressWarnings("unchecked")
   private static final Map<Integer, String> dialects = 
-    unmodifiableMap(new HashMap() {{
+    unmodifiableMap(new TreeMap() {{
       put(DARING, "Daring Fireball");
       put(GITHUB, "GitHub Flavored");
       put(STACKO, "Stack Overflow Flavored");
@@ -75,7 +75,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   //
   @SuppressWarnings("unchecked")
   private static final Map<String, Integer> extensions_map =
-    unmodifiableMap(new HashMap() {{
+    unmodifiableMap(new TreeMap() {{
       put("md", DARING);
     }});
   

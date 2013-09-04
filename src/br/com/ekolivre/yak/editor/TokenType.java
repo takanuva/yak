@@ -53,7 +53,7 @@ public enum TokenType implements AbstractTokenType {
   LINE_COMMENT          (                0x007F00                ),
   BLOCK_COMMENT         (                0x007F00                ),
   NESTED_COMMENT        (                                        ),
-  HEREDOC_COMMENT       (                                        ),
+  HEREDOC_COMMENT       (        0x000000, 0x7FFF7F, TEOL        ),
   SPEC_COMMENT          (                0xC18A34                ),
   EMACS_TAG             (                                        ),
   URL                   (                                        ),

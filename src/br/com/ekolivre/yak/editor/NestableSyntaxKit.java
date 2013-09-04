@@ -663,7 +663,6 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
   
   
   
-  
   /**
    *
    */

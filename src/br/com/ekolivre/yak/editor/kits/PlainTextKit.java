@@ -35,7 +35,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
 public class PlainTextKit extends DefaultSyntaxKit {
   @SuppressWarnings("unchecked")
   private static final Map<String, Integer> extensions_map =
-    unmodifiableMap(new HashMap() {{
+    unmodifiableMap(new TreeMap() {{
       put("txt", null);
       put("TXT", null);
     }});

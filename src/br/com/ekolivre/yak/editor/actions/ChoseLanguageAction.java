@@ -94,7 +94,7 @@ public class ChoseLanguageAction extends AbstractEditorAction {
       
       if(dialects != null && dialects.size() > 0) {
         
-        Integer d = dialect == null ? item.getDefaultDialect() : dialect;
+        int d = dialect == null ? item.getDefaultDialect() : dialect;
         
         for(Map.Entry<Integer, String> i: dialects.entrySet()) {
           DialectItem aux = new DialectItem(i.getKey(), i.getValue(),
@@ -104,6 +104,7 @@ public class ChoseLanguageAction extends AbstractEditorAction {
           
           if(i.getKey() == d)
             dialect_box.setSelectedItem(aux);
+
         };
         
         dialect_box.setVisible(true);
