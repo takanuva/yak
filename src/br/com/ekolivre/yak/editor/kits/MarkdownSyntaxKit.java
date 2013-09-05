@@ -27,164 +27,84 @@
 package br.com.ekolivre.yak.editor.kits;
 
 import java.util.*;
+import java.util.regex.*;
 import br.com.ekolivre.yak.editor.*;
 import static java.lang.System.*;
 import static java.util.Collections.*;
 import static br.com.ekolivre.yak.editor.TokenType.*;
 
-%%
-
-%class MarkdownSyntaxKit
-
-%public
-%unicode
-%type br.com.ekolivre.yak.editor.Token
-%extends JFlexBasedSyntaxKit<MarkdownSyntaxKit.Context>
-
-%{
+/**
+ *
+ */
+public class MarkdownSyntaxKit extends NestableSyntaxKit {
   //
-  public static final int DARING = 0x01;
+  //public static final int DARING = 0x01;
   public static final int GITHUB = 0x02;
-  public static final int STACKO = 0x04;
-  
-  //
-  protected static class Context {
-    private boolean italic;
-    private boolean bold;
-    
-    private Context() {
-      italic = false;
-      bold = false;
-    };
-    
-    private Context(Context other) {
-      this.italic = other.italic;
-      this.bold = other.bold;
-    };
-  };
+  //public static final int STACKO = 0x04;
   
   //
   @SuppressWarnings("unchecked")
   private static final Map<Integer, String> dialects = 
     unmodifiableMap(new TreeMap() {{
-      put(DARING, "Daring Fireball");
-      put(GITHUB, "GitHub Flavored");
-      put(STACKO, "Stack Overflow Flavored");
+      //put(DARING, "Daring Fireball");
+      put(GITHUB, "Github Flavored");
+      //put(STACKO, "Stack Overflow Flavored");
     }});
   
   //
   @SuppressWarnings("unchecked")
   private static final Map<String, Integer> extensions_map =
     unmodifiableMap(new TreeMap() {{
-      put("md", DARING);
+      put("md", GITHUB);
     }});
   
   //
-  public MarkdownSyntaxKit() {
-    return;
-  };
+  private static final Pattern PATTERN_EMPHASIS = Pattern.compile(
+    "(?<=\\s|\\A)(?<!\\\\)(([_*])\\2?\\2?)[^\\s_]((?<!\r\n)\r\n|(?<!\r)\r|(?<" +
+    "!\n)\n|.)*?(?<=[^\\s])\\1"
+  );
   
   //
+  @Override
+  protected final Token getToken(TokenState state) {
+    
+    int i;
+    
+    String match[] = new String[2];
+    i = checkRegex(PATTERN_EMPHASIS, match);
+    if(i > 0)
+      switch(match[1].length()) {
+        case 1: return token(i, DEFAULT_ITALIC, state);
+        case 2: return token(i, DEFAULT_BOLD, state);
+        case 3: return token(i, DEFAULT_BOLD_ITALIC, state);
+        default: assert false;
+      };
+    
+    return null;
+  };
+  
   @Override
   public Map<Integer, String> getDialectList() {
     return dialects;
   };
   
-  //
   @Override
   public int getDefaultDialect() {
     return GITHUB;
   };
   
-  //
   @Override
   public Map<String, Integer> getFileExtensions() {
     return extensions_map;
   };
   
-  //
   @Override
   public String getContentType() {
     return "text/x-markdown";
   };
   
-  // 
   @Override
   public String getKitName() {
     return "Markdown";
   };
-  
-  //
-  private Context getActiveContext() {
-    if(yystate != null) {
-      if(yystate.userData() != null &&
-         yystate.userData() instanceof Context) {
-        return new Context((Context)yystate.userData());
-      };
-    };
-    
-    return new Context();
-  };
-  
-  //
-  private Token adequateToken() {
-    return adequateToken(getActiveContext());
-  };
-  
-  //
-  private Token adequateToken(Context context) {
-    
-    Context active = getActiveContext();
-    
-    if(active.bold && active.italic)
-      return token(DEFAULT_BOLD_ITALIC, context);
-    else if(active.bold)
-      return token(DEFAULT_BOLD, context);
-    else if(active.italic)
-      return token(DEFAULT_ITALIC, context);
-    else
-      return token(DEFAULT, context);
-  };
-  
-  //
-  public int yypos() {
-    return zzStartRead;
-  };
-%}
-
-%%
-
-/*"____"+ {
-  return adequateToken();
-}
-
-"___" {
-  Context context = getActiveContext();
-  context.bold = !context.bold;
-  context.italic = !context.italic;
-  return adequateToken(context);
-}
-
-"__" {
-  Context context = getActiveContext();
-  context.bold = !context.bold;
-  return adequateToken(context);
-}
-
-"_" {
-  Context context = getActiveContext();
-  context.italic = !context.italic;
-  return adequateToken(context);
-}
-
-[^ \t] {
-  return adequateToken();
-}*/
-
-.|\r|\n {
-  return null;
-}
-
-<<EOF>> {
-  return null;
-}
+};

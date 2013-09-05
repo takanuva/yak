@@ -39,7 +39,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
 %public
 %unicode
 %type br.com.ekolivre.yak.editor.Token
-%extends JFlexBasedSyntaxKit<MarkdownSyntaxKit.Context>
+%extends JFlexBasedSyntaxKit<Void>
 
 %{
   //

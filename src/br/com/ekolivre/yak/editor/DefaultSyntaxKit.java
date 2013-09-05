@@ -153,14 +153,15 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
     
     this.editor = editor;
     
+    addPopupMenu();
+  };
+  
+  //
+  private final void addPopupMenu() {
     JPopupMenu menu = new JPopupMenu();
-    
     populate(menu);
-    
     menu.pack();
-    
     editor.setComponentPopupMenu(menu);
-    
   };
   
   //
@@ -378,6 +379,8 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
           
           b.setText(b.getToolTipText());
           b.setToolTipText("");
+          
+          b.addActionListener(e -> c.setVisible(false));
           
           c.add(b);
           

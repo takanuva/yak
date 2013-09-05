@@ -553,7 +553,7 @@ public abstract class NestableSyntaxKit extends DefaultSyntaxKit {
     if(matcher.lookingAt()) {
       
       if(matches != null) {
-        int end = Math.max(matches.length, matcher.groupCount());
+        int end = Math.min(matches.length, matcher.groupCount());
         for(int i = 0; i < end; i++) {
           matches[i] = seq.subSequence(
             matcher.start(i),

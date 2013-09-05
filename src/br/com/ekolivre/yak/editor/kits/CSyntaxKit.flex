@@ -218,6 +218,10 @@ N = [:digit:]+
     return token(STANDARD);
   }
   
+  "main" {
+    return token(STANDARD);
+  }
+  
   // ctype.h
   "isalnum"  |
   "isalpha"  |
@@ -348,6 +352,7 @@ N = [:digit:]+
     return token(STANDARD);
   }
   
+  // limits.h - C99
   "LLONG_MIN"  |
   "LLONG_MAX"  |
   "ULLONG_MAX" {
@@ -355,13 +360,156 @@ N = [:digit:]+
       return token(STANDARD);
   }
   
+  // locale.h
+  "lconv"      |
+  "setlocale"  |
+  "localeconv" {
+    return token(STANDARD);
+  }
   
+  // math.h
+  "cos"              |
+  "sin"              |
+  "tan"              |
+  "acos"             |
+  "asin"             |
+  "atan"             |
+  "atan2"            |
+  "cosh"             |
+  "sinh"             |
+  "tanh"             |
+  "acosh"            |
+  "asinh"            |
+  "atanh"            |
+  "exp"              |
+  "frexp"            |
+  "ldexp"            |
+  "log"              |
+  "log10"            |
+  "modf"             |
+  "pow"              |
+  "sqrt"             |
+  "ceil"             |
+  "floor"            |
+  "fmod"             |
+  "copysign"         |
+  "NAN"              |
+  "nextafter"        |
+  "nexttoward"       |
+  "fdim"             |
+  "fmax"             |
+  "fmin"             |
+  "fabs"             |
+  "abs"              |
+  "fpclassify"       |
+  "isfinite"         |
+  "isinf"            |
+  "isnan"            |
+  "isnormal"         |
+  "signbit"          |
+  "isgreater"        |
+  "isgreaterequal"   |
+  "isless"           |
+  "islessequal"      |
+  "islessgreater"    |
+  "isunordered"      |
+  "math_errhandling" |
+  "INFINITY"         |
+  "HUGE_VAL"         |
+  "HUGE_VALF"        |
+  "HUGE_VALL"        |
+  "MATH_ERRNO"       |
+  "MATH_ERREXCEPT"   |
+  "FP_FAST_FMA"      |
+  "FP_FAST_FMAF"     |
+  "FP_FAST_FMAL"     |
+  "FP_INFINITE"      |
+  "FP_NAN"           |
+  "FP_NORMAL"        |
+  "FP_SUBNORMAL"     |
+  "FP_ZERO"          |
+  "FP_ILOGB0"        |
+  "FP_ILOGBNAN"      |
+  "double_t"         |
+  "float_t"          {
+    return token(STANDARD);
+  }
   
+  // locale.h - C99
+  "exp2"      |
+  "expm1"     |
+  "ilog"      |
+  "log1p"     |
+  "log2"      |
+  "logb"      |
+  "scalbn"    |
+  "scalbln"   |
+  "cbrt"      |
+  "hypot"     |
+  "erf"       |
+  "erfc"      |
+  "tgamma"    |
+  "lgamma"    |
+  "trunc"     |
+  "round"     |
+  "lround"    |
+  "llround"   |
+  "rint"      |
+  "lrint"     |
+  "llrint"    |
+  "nearbyint" |
+  "remainder" |
+  "remquo"    |
+  "fma"       {
+    if(getDialect() >= C99)
+      return token(STANDARD);
+  }
   
+  // setjmp.h
+  "longjmp" |
+  "setjmp"  |
+  "jmp_buf" {
+    return token(STANDARD);
+  }
   
+  // signal.h
+  "signal"       |
+  "raise"        |
+  "sig_atomic_t" |
+  "SIGABRT"      |
+  "SIGFPE"       |
+  "SIGILL"       |
+  "SIGINT"       |
+  "SIGSEGV"      |
+  "SIGTERM"      |
+  "SIG_DFL"      |
+  "SIG_IGN"      |
+  "SIG_ERR"      {
+    return token(STANDARD);
+  }
   
+  // stdarg.h
+  "va_list"  |
+  "va_start" |
+  "va_arg"   |
+  "va_end"   {
+    return token(STANDARD);
+  }
   
+  // stdarg.h - C99
+  "va_copy" {
+    if(getDialect() >= C99)
+      return token(STANDARD);
+  }
   
+  // stdbool.h - C99
+  "true"                          |
+  "false"                         |
+  "bool"                          |
+  "__bool_true_false_are_defined" {
+    if(getDialect() >= C99)
+      return token(STANDARD);
+  }
   
   
   
