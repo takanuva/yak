@@ -28,6 +28,7 @@ package br.com.ekolivre.yak.editor.kits;
 
 import java.util.*;
 import java.util.regex.*;
+import javax.swing.*;
 import br.com.ekolivre.yak.editor.*;
 import static java.lang.System.*;
 import static java.util.Collections.*;
@@ -58,11 +59,42 @@ public class MarkdownSyntaxKit extends NestableSyntaxKit {
       put("md", GITHUB);
     }});
   
+  /**
+   *
+   */
+  public class MarkdownPreviewAction extends AbstractEditorAction {
+    /**
+     *
+     */
+    private JComponent makePreview() {
+      JEditorPane x = new JEditorPane();
+      JScrollPane y = new JScrollPane(x);
+      return y;
+    };
+    
+    //
+    @Override
+    protected JComponent makeComponents()[] {
+      return new JComponent[] {
+        makeButton("icons/internet-web-browser.png", "Preview...", () -> {
+          if(preview == null) {
+            preview = addWidget(makePreview());
+          } else {
+            preview = delWidget(preview);
+          };
+        })
+      };
+    };
+  };
+  
   //
   private static final Pattern PATTERN_EMPHASIS = Pattern.compile(
     "(?<=\\s|\\A)(?<!\\\\)(([_*])\\2?\\2?)[^\\s_]((?<!\r\n)\r\n|(?<!\r)\r|(?<" +
     "!\n)\n|.)*?(?<=[^\\s])\\1"
   );
+  
+  //
+  WidgetComponent preview = null;
   
   //
   @Override
@@ -96,6 +128,12 @@ public class MarkdownSyntaxKit extends NestableSyntaxKit {
   @Override
   public Map<String, Integer> getFileExtensions() {
     return extensions_map;
+  };
+  
+  @Override
+  public void populate(JComponent c) {
+    super.populate(c);
+    super.addAction(c, new MarkdownPreviewAction());
   };
   
   @Override

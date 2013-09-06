@@ -45,7 +45,7 @@ public class WidgetComponent extends JComponent {
    */
   private static class ResizableBorder implements Border {
     //
-    private final int dist = 6;
+    private final int dist = 7;
     
     //
     final static int locations[] = {
@@ -172,24 +172,17 @@ public class WidgetComponent extends JComponent {
   /**
    *
    */
-  public WidgetComponent(Component c) {
-    this(c, true);
+  public WidgetComponent(DefaultSyntaxKit kit, Component c) {
+    this(kit, c, true);
   };
   
   /**
    *
    */
-  public WidgetComponent(Component c, boolean resizable) {
-    this(c, new ResizableBorder());
-  };
-  
-  /**
-   *
-   */
-  private WidgetComponent(Component c, ResizableBorder b) {
+  public WidgetComponent(DefaultSyntaxKit kit, Component c, boolean resizable) {
     setLayout(new BorderLayout());
+    setBorder(new ResizableBorder());
     add(c);
-    setBorder(b);
   };
   
   public void setBorder(Border b) {

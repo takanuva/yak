@@ -368,7 +368,7 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
   /**
    *
    */
-  private void addAction(JComponent c, AbstractEditorAction a) {
+  protected void addAction(JComponent c, AbstractEditorAction a) {
     
     JComponent children[] = a.makeComponents();
     if(children != null)
@@ -391,6 +391,32 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
   /**
    *
    */
+  protected WidgetComponent addWidget(JComponent child) {
+    WidgetComponent widget = new WidgetComponent(this, child);
+    widget.setBounds(0, 0, 150, 150);
+    
+    editor.add(widget);
+    editor.repaint();
+    widget.invalidate();
+    editor.revalidate();
+    
+    return widget;
+  };
+  
+  /**
+   *
+   */
+  protected WidgetComponent delWidget(WidgetComponent widget) {
+    editor.remove(widget);
+    editor.repaint();
+    
+    // Always...
+    return null;
+  };
+  
+  /**
+   *
+   */
   public void getDisplayText(int pos, int len, Segment seg)
   throws BadLocationException {
     getDocument().getText(pos, len, seg);
@@ -407,7 +433,7 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
    *
    */
   public boolean isFixedForm() {
-    return true;
+    return false;
   };
   
   @Override

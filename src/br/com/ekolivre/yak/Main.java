@@ -482,17 +482,17 @@ public final class Main extends JFrame {
     
     
     
-    JEditorPane x = new JEditorPane();
+    /*JEditorPane x = new JEditorPane();
     JScrollPane y = new JScrollPane(x);
     
-    WidgetComponent w = new WidgetComponent(y);
+    WidgetComponent w = new WidgetComponent((DefaultSyntaxKit)editor.getEditorKit(), y);
     w.setBounds(0, 0, 150, 150);
     
     editor.add(w);
     editor.repaint();
     
     w.invalidate();
-    editor.validate();
+    editor.validate();*/
     
     
   };
