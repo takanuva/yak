@@ -396,6 +396,20 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
     getDocument().getText(pos, len, seg);
   };
   
+  /**
+   *
+   */
+  public int getLimitPosition() {
+    return 80;
+  };
+  
+  /**
+   *
+   */
+  public boolean isFixedForm() {
+    return true;
+  };
+  
   @Override
   public final String toString() {
     return getKitName();

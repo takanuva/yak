@@ -137,8 +137,12 @@ implements TabExpander {
     return kit.getSkin();
   };
   
+  public boolean isFixedForm() {
+    return kit.isFixedForm();
+  };
+  
   public int limitPosition() {
-    return 80;
+    return kit.getLimitPosition();
   };
   
   public boolean useSoftWrap() {

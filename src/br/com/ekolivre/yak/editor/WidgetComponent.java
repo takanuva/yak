@@ -32,135 +32,136 @@ import java.awt.event.*;
 import javax.swing.text.*;
 import javax.swing.event.*;
 import javax.swing.border.*;
+import static java.awt.Cursor.*;
 import static javax.swing.SwingConstants.*;
 
 /**
- * Thanks to http://www.jroller.com/santhosh/entry/resizable_components for the
+ * I've used http://www.jroller.com/santhosh/entry/resizable_components as the
  * base to implement this. Thanks to the author. :)
  */
 public class WidgetComponent extends JComponent {
-  
+  /**
+   *
+   */
   private static class ResizableBorder implements Border {
+    //
+    private final int dist = 6;
+    
+    //
     final static int locations[] = {
-      NORTH,
-      SOUTH,
-      WEST,
-      EAST,
-      NORTH_WEST,
-      NORTH_EAST,
-      SOUTH_WEST,
-      SOUTH_EAST,
-      0,
-      -1
+      NORTH, SOUTH, WEST, EAST,
+      NORTH_WEST,   NORTH_EAST,
+      SOUTH_WEST,   SOUTH_EAST,
+      0,            -1
     };
     
+    //
     final static int cursors[] = {
-      Cursor.N_RESIZE_CURSOR,
-      Cursor.S_RESIZE_CURSOR,
-      Cursor.W_RESIZE_CURSOR,
-      Cursor.E_RESIZE_CURSOR,
-      Cursor.NW_RESIZE_CURSOR,
-      Cursor.NE_RESIZE_CURSOR,
-      Cursor.SW_RESIZE_CURSOR,
-      Cursor.SE_RESIZE_CURSOR,
-      Cursor.MOVE_CURSOR,
-      Cursor.DEFAULT_CURSOR
+      N_RESIZE_CURSOR,  S_RESIZE_CURSOR,
+      W_RESIZE_CURSOR,  E_RESIZE_CURSOR,
+      NW_RESIZE_CURSOR, NE_RESIZE_CURSOR,
+      SW_RESIZE_CURSOR, SE_RESIZE_CURSOR,
+      MOVE_CURSOR,      DEFAULT_CURSOR
     };
     
-    private int distance;
-    
-    private ResizableBorder(int distance) {
-      this.distance = distance;
+    //
+    @Override
+    public Insets getBorderInsets(Component component){
+      return new Insets(dist, dist, dist, dist);
     };
     
-    public Insets getBorderInsets(Component c) {
-      return new Insets(distance, distance, distance, distance);
-    };
-    
+    //
     @Override
     public boolean isBorderOpaque() {
       return false;
     };
     
+    //
     @Override
-    public void paintBorder(Component c, Graphics g, int x, int y, int w,
-                            int h) {
+    public void paintBorder(Component c, Graphics g,
+                            int x, int y, int w, int h) {
       //
+      g.setColor(Color.black);
+      g.drawRect(x + dist / 2,
+                 y + dist / 2,
+                 w - dist,
+                 h - dist);
       
+      //
+      for(int i = 0; i < locations.length - 2; i++) {
+        Rectangle rect = getRect(x, y, w, h, locations[i]);
+        g.setColor(Color.WHITE);
+        g.fillRect(rect.x, rect.y, rect.width - 1, rect.height - 1);
+        g.setColor(Color.BLACK);
+        g.drawRect(rect.x, rect.y, rect.width - 1, rect.height - 1);
+      };
     };
     
     //
-    private Rectangle getRect(int x, int y, int w, int h, int l) {
-      switch(l) {
+    private Rectangle getRect(int x, int y, int w, int h, int location){
+      switch(location){
         case NORTH:
-          return new Rectangle(x + w / 2 - distance / 2 ,
+          return new Rectangle(x + w / 2 - dist / 2,
                                y,
-                               distance,
-                               distance);
+                               dist,
+                               dist);
         case SOUTH:
-          return new Rectangle(x + w / 2 - distance / 2,
-                               y + h - distance,
-                               distance,
-                               distance);
+          return new Rectangle(x + w / 2 - dist / 2,
+                               y + h - dist,
+                               dist,
+                               dist);
         case WEST:
           return new Rectangle(x,
-                               y + h / 2 - distance / 2,
-                               distance,
-                               distance);
+                               y + h / 2 - dist / 2,
+                               dist,
+                               dist);
         case EAST:
-          return new Rectangle(x + w - distance,
-                               y + h / 2 - distance / 2,
-                               distance,
-                               distance);
+          return new Rectangle(x + w - dist,
+                               y + h / 2 - dist / 2,
+                               dist,
+                               dist);
         case NORTH_WEST:
           return new Rectangle(x,
                                y,
-                               distance,
-                               distance);
+                               dist,
+                               dist);
         case NORTH_EAST:
-          return new Rectangle(x + w - distance,
+          return new Rectangle(x + w - dist,
                                y,
-                               distance,
-                               distance);
+                               dist,
+                               dist);
         case SOUTH_WEST:
           return new Rectangle(x,
-                               y + h - distance,
-                               distance,
-                               distance);
+                               y + h - dist,
+                               dist,
+                               dist);
         case SOUTH_EAST:
-          return new Rectangle(x + w - distance,
-                               y + h - distance,
-                               distance,
-                               distance); 
+          return new Rectangle(x + w - dist,
+                               y + h - dist,
+                               dist,
+                               dist);
       };
       
       return null;
     };
-    
-    //
-    private int getResizeCursor(MouseEvent e) {
-      
-      Component c = e.getComponent();
-      
+
+    public int getResizeCursor(MouseEvent e) {
       Point p = e.getPoint();
-      
+      Component c = e.getComponent();
       int w = c.getWidth();
       int h = c.getHeight();
       
-      Rectangle r = new Rectangle(0, 0, w, h);
+      Rectangle b = new Rectangle(0, 0, w, h);
       
-      if(!r.contains(p))
+      if(!b.contains(p))
         return Cursor.DEFAULT_CURSOR;
       
-      Rectangle a = new Rectangle(distance, distance, w - 2 * distance,
-                                  h - 2 * distance);
+      Rectangle a = new Rectangle(dist, dist, w - 2 * dist, h - 2 * dist);
       if(a.contains(p))
         return Cursor.DEFAULT_CURSOR;
       
-      
-      for(int i = 0; i < locations.length - 2; i++) {
-        Rectangle x = getRect(0, 0, w, h, locations[i]);
-        if(x.contains(p))
+      for(int i=0; i<locations.length-2; i++){
+        if(getRect(0, 0, w, h, locations[i]).contains(p))
           return cursors[i];
       };
       
@@ -168,58 +169,123 @@ public class WidgetComponent extends JComponent {
     };
   };
   
-  //
-  private final MouseInputListener listener = new MouseInputAdapter() {
-    private int cursor;
-    private Point start = null;
-    
-    @Override
-    public void mouseMoved(MouseEvent e) {
-      ResizableBorder border = (ResizableBorder)getBorder();
-      cursor = border.getResizeCursor(e);
-      start = e.getPoint();
-    };
-    
-    @Override
-    public void mouseExited(MouseEvent e) {
-      
-    };
-    
-    @Override
-    public void mousePressed(MouseEvent e) {
-      
-    };
-    
-    @Override
-    public void mouseDragged(MouseEvent e) {
-      
-    };
-    
-    @Override
-    public void mouseReleased(MouseEvent e) {
-      
-    };
+  /**
+   *
+   */
+  public WidgetComponent(Component c) {
+    this(c, true);
   };
   
-  public WidgetComponent(JComponent child) {
+  /**
+   *
+   */
+  public WidgetComponent(Component c, boolean resizable) {
+    this(c, new ResizableBorder());
+  };
+  
+  /**
+   *
+   */
+  private WidgetComponent(Component c, ResizableBorder b) {
     setLayout(new BorderLayout());
-    add(child);
-    setBorder(new ResizableBorder(6));
+    add(c);
+    setBorder(b);
   };
   
-  public void setBorder(Border border) {
-    if(!(border instanceof ResizableBorder)) {
-      removeMouseListener(listener);
-      removeMouseMotionListener(listener);
+  public void setBorder(Border b) {
+    removeMouseListener(resizeListener);
+    removeMouseMotionListener(resizeListener);
+    if(b instanceof ResizableBorder) {
+      addMouseListener(resizeListener);
+      addMouseMotionListener(resizeListener);
     };
-    super.setBorder(border);
+    super.setBorder(b);
   };
   
   private void didResize() {
-    if(getParent() != null) {
+    if(getParent() != null){
       getParent().repaint();
       invalidate();
       ((JComponent)getParent()).revalidate();
+    };
+  };
+  
+  MouseInputListener resizeListener = new MouseInputAdapter() {
+    public void mouseMoved(MouseEvent e) {
+      ResizableBorder b = (ResizableBorder)getBorder();
+      setCursor(getPredefinedCursor(b.getResizeCursor(e)));
+    };
+
+    public void mouseExited(MouseEvent e) {
+      setCursor(getDefaultCursor());
+    };
+    
+    private int cursor;
+    private Point startPos = null;
+    
+    public void mousePressed(MouseEvent e) {
+      ResizableBorder b = (ResizableBorder)getBorder();
+      cursor = b.getResizeCursor(e);
+      startPos = e.getPoint();
+    };
+    
+    public void mouseDragged(MouseEvent e) {
+      if(startPos != null){
+        int dx = e.getX() - startPos.x;
+        int dy = e.getY() - startPos.y;
+        switch(cursor) {
+          case N_RESIZE_CURSOR: {
+            setBounds(getX(), getY() + dy, getWidth(), getHeight() - dy);
+            didResize();
+          } break;
+          case S_RESIZE_CURSOR: {
+            setBounds(getX(), getY(), getWidth(), getHeight() + dy);
+            startPos = e.getPoint();
+            didResize();
+          } break;
+          case W_RESIZE_CURSOR: {
+            setBounds(getX() + dx, getY(), getWidth() - dx, getHeight());
+            didResize();
+          } break;
+          case Cursor.E_RESIZE_CURSOR: {
+            setBounds(getX(), getY(), getWidth() + dx, getHeight());
+            startPos = e.getPoint();
+            didResize();
+          } break;
+          case NW_RESIZE_CURSOR: {
+            setBounds(getX() + dx, getY() + dy, getWidth() - dx,
+                                                getHeight() - dy);
+            didResize();
+          } break;
+          case NE_RESIZE_CURSOR: {
+            setBounds(getX(), getY() + dy, getWidth() + dx, getHeight() - dy);
+            startPos = new Point(e.getX(), startPos.y);
+            didResize();
+          } break;
+          case SW_RESIZE_CURSOR: {
+            setBounds(getX() + dx, getY(), getWidth() - dx, getHeight() + dy);
+            startPos = new Point(startPos.x, e.getY());
+            didResize();
+          } break;
+          case SE_RESIZE_CURSOR: {
+             setBounds(getX(), getY(), getWidth() + dx, getHeight() + dy);
+             startPos = e.getPoint();
+             didResize();
+          } break;
+          case MOVE_CURSOR: {
+            Rectangle bounds = getBounds();
+            bounds.translate(dx, dy);
+            setBounds(bounds);
+            didResize();
+          } break;
+        };
+        
+        setCursor(getPredefinedCursor(cursor));
+      };
+    };
+    
+    public void mouseReleased(MouseEvent e) {
+      startPos = null;
     };
   };
 };

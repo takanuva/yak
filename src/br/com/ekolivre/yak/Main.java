@@ -117,7 +117,7 @@ public final class Main extends JFrame {
     //openFile(new File("test.prg"));
     //openUntitledFile("text/x-source-code");
     
-    //openUntitledFile("text/x-markdown");
+    openUntitledFile("text/x-markdown");
     
     //openFile(new File("bys/x-csharp/add.cs"));
     //openFile(new File("bys/x-csharp/getset.cs"));
@@ -470,6 +470,31 @@ public final class Main extends JFrame {
     
     editor.requestFocusInWindow();
     updateStatus(1, 1, 0);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    JEditorPane x = new JEditorPane();
+    JScrollPane y = new JScrollPane(x);
+    
+    WidgetComponent w = new WidgetComponent(y);
+    w.setBounds(0, 0, 150, 150);
+    
+    editor.add(w);
+    editor.repaint();
+    
+    w.invalidate();
+    editor.validate();
+    
+    
   };
   
   static class TabComponent extends JPanel {

@@ -73,11 +73,21 @@ public abstract class SyntaxSkin {
     
     @Override
     public void drawLimitArea(Graphics g, SyntaxView v) {
-      g.setColor(AREA_COLOR);
+      /*g.setColor(AREA_COLOR);
       
-      int x = getGutterWidth(v) + v.metrics.charWidth(' ') * v.limitPosition();
+      int w = getGutterWidth(v);
+      int c = v.metrics.charWidth(' ');
+      int h = v.getContainer().getHeight();
       
-      g.fillRect(x, 0, 1, v.getContainer().getHeight());
+      if(v.isFixedForm()) {
+        g.fillRect(w + c * 5, 0, 1, h);
+        g.fillRect(w + c * 6, 0, 1, h);
+        g.fillRect(w + c * 72, 0, 1, h);
+        g.fillRect(w + c * 80, 0, 1, h);
+        return;
+      } else {
+        g.fillRect(w + c * v.limitPosition(), 0, 1, h);
+      };*/
     };
     
     @Override
@@ -250,15 +260,30 @@ public abstract class SyntaxSkin {
       
       g.setColor(AREA_COLOR);
       
-      int x = getGutterWidth(v) + v.metrics.charWidth(' ') * v.limitPosition();
+      int w = getGutterWidth(v);
+      int c = v.metrics.charWidth(' ');
       int h = v.metrics.getHeight();
+      
+      if(v.isFixedForm()) {
+        drawLineOn(g, v, w, c, h, 5);
+        drawLineOn(g, v, w, c, h, 6);
+        drawLineOn(g, v, w, c, h, 72);
+        drawLineOn(g, v, w, c, h, 80);
+      } else {
+        drawLineOn(g, v, w, c, h, v.limitPosition());
+      };
+      
+    };
+    
+    private void drawLineOn(Graphics g, SyntaxView v, int w, int c, int h,
+                            int p) {
+      int x = w + c * p;
       
       Rectangle rect = g.getClipBounds();
       
       for(int y = (rect.y / h) * h - 2; y < rect.y + rect.height; y += h) {
         g.fillRect(x, y + 2, 1, h - 4);
       };
-      
     };
     
     @Override
@@ -360,9 +385,19 @@ public abstract class SyntaxSkin {
     public void drawLimitArea(Graphics g, SyntaxView v) {
       g.setColor(AREA_COLOR);
       
-      int x = getGutterWidth(v) + v.metrics.charWidth(' ') * v.limitPosition();
+      int w = getGutterWidth(v);
+      int c = v.metrics.charWidth(' ');
+      int h = v.getContainer().getHeight();
       
-      g.fillRect(x, 0, 1, v.getContainer().getHeight());
+      if(v.isFixedForm()) {
+        g.fillRect(w + c * 6, 0, 1, h);
+        g.fillRect(w + c * 7, 0, 1, h);
+        g.fillRect(w + c * 72, 0, 1, h);
+        g.fillRect(w + c * 80, 0, 1, h);
+        return;
+      } else {
+        g.fillRect(w + c * v.limitPosition(), 0, 1, h);
+      };
     };
     
     @Override
