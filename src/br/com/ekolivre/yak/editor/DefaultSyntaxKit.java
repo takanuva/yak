@@ -35,6 +35,7 @@ import java.awt.Shape;
 import java.util.jar.*;
 import java.awt.event.*;
 import javax.swing.text.*;
+import java.awt.Component;
 import javax.swing.event.*;
 import br.com.ekolivre.yak.editor.actions.*;
 import static java.lang.System.*;
@@ -144,6 +145,8 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
   @Override
   public void install(JEditorPane editor) {
     super.install(editor);
+
+    //err.printf("[%s]#install()%n", this);
     
     editor.setFont(getDefaultFont());
     editor.setCaret(createCaret());
@@ -154,6 +157,13 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
     this.editor = editor;
     
     addPopupMenu();
+    
+    onInstall();
+  };
+  
+  //
+  protected void onInstall() {
+    //err.printf("[%s]#onInstall()%n", this);
   };
   
   //
@@ -167,10 +177,17 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
   //
   @Override
   public void deinstall(JEditorPane editor) {
+    //err.printf("[%s]#deinstall()%n", this);
+    onDeinstall();
     super.deinstall(editor);
     editor.removeKeyListener(this);
     assert(this.editor == editor);
     this.editor = null;
+  };
+  
+  //
+  protected void onDeinstall() {
+    //err.printf("[%s]#onDeinstall()%n", this);
   };
   
   //
@@ -407,8 +424,10 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
    *
    */
   protected WidgetComponent delWidget(WidgetComponent widget) {
-    editor.remove(widget);
-    editor.repaint();
+    if(widget != null) {
+      editor.remove(widget);
+      editor.repaint();
+    };
     
     // Always...
     return null;
@@ -436,9 +455,11 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
     return false;
   };
   
-  @Override
-  public final String toString() {
-    return getKitName();
+  /**
+   *
+   */
+  public void onChangeAt(Token last) {
+    return;
   };
   
   /**
@@ -488,6 +509,11 @@ implements Comparable<DefaultSyntaxKit>, ViewFactory, KeyListener {
     };
     
     return null;
+  };
+  
+  @Override
+  public final String toString() {
+    return getKitName();
   };
   
   /**

@@ -26,7 +26,9 @@
 *******************************************************************************/
 package br.com.ekolivre.yak.editor.kits;
 
+import java.awt.*;
 import java.util.*;
+import javax.swing.*;
 import br.com.ekolivre.yak.editor.*;
 import static java.lang.System.*;
 import static java.util.Collections.*;
@@ -39,7 +41,7 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
 %public
 %unicode
 %type br.com.ekolivre.yak.editor.Token
-%extends JFlexBasedSyntaxKit<Void>
+%extends JFlexBasedSyntaxKit<UMLSyntaxKit.UMLLexicalState>
 
 %{
   //
@@ -49,10 +51,127 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
       put("uml", null);
     }});
   
+  protected enum UMLLexicalState {
+    UMLClass,
+    UMLExtends;
+  };
+  
+  /**
+   *
+   */
+  public class UMLClass {
+    
+  };
+  
+  /**
+   *
+   */
+  public class UMLPanel extends JPanel {
+    //
+    private Map<String, UMLClass> classes;
+    
+    //
+    private int known = 0;
+    
+    //
+    public UMLPanel() {
+      classes = new HashMap<String, UMLClass>();
+    };
+    
+    //
+    private void rebuildFrom(int x) {
+      
+    };
+    
+    //
+    @SuppressWarnings("unchecked")
+    private void buildDiagrams() {
+      Iterable<Token> list = getDocument().getTokens(known);
+      
+      for(Token t: list) {
+        final TokenState state = t.getState();
+        if(state instanceof JFlexBasedSyntaxKit<?>.JFlexBasedTokenState) {
+          
+          final JFlexBasedTokenState state2 = (JFlexBasedTokenState)state;
+          
+          UMLLexicalState lex = state2.userData();
+          
+          if(lex != null) {
+            
+          };
+          
+        };
+      };
+      
+    };
+    
+    //
+    @Override
+    public void paint(Graphics g) {
+      super.paint(g);
+      
+      buildDiagrams();
+      
+    };
+  };
+  
+  /**
+   *
+   */
+  public class UMLRendererAction extends AbstractEditorAction {
+    //
+    @Override
+    protected JComponent makeComponents()[] {
+      return new JComponent[] {
+        makeButton("icons/internet-web-browser.png", "Preview...", () -> {
+          if(renderer == null) {
+            renderer = addWidget(new UMLPanel());
+          } else {
+            renderer = delWidget(renderer);
+          };
+        })
+      };
+    };
+  };
+  
   //
-  /* public UMLSyntaxKit() {
+  WidgetComponent renderer = null;
+  
+  //
+  public UMLSyntaxKit() {
     return;
-  }; /* by removing the constructor, this syntax kit is not listed yet */
+  };
+  
+  //
+  @Override
+  protected void onInstall() {
+    super.onInstall();
+    renderer = addWidget(new UMLPanel());
+  };
+  
+  //
+  @Override
+  protected void onDeinstall() {
+    renderer = delWidget(renderer);
+    super.onDeinstall();
+  };
+  
+  //
+  @Override
+  public final void onChangeAt(Token last) {
+    if(renderer != null) {
+      
+      UMLPanel uml = (UMLPanel)renderer.getChild();
+      
+      if(last == null)
+        uml.rebuildFrom(0);
+      else uml.rebuildFrom(last.end());
+      
+      /*if(last == null)
+        renderer.invalidate();
+      else renderer.invalidate(last.end());*/
+    };
+  };
   
   //
   @Override
@@ -70,6 +189,12 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   @Override
   public Map<String, Integer> getFileExtensions() {
     return extensions_map;
+  };
+  
+  @Override
+  public void populate(JComponent c) {
+    super.populate(c);
+    super.addAction(c, new UMLRendererAction());
   };
   
   //
@@ -90,21 +215,59 @@ import static br.com.ekolivre.yak.editor.TokenType.*;
   };
 %}
 
-KEYWORD = "class"
-        | "extends"
-
-%state YYIDENTIFIER
+%state YYCLASS
+%state YYCLASS2
+%state YYEXTENDS
 
 %%
 
-<YYINITIAL>{KEYWORD} {
-  yybegin(YYIDENTIFIER);
-  return token(KEYWORD);
+<YYINITIAL> {
+  "class" {
+    yypush(YYCLASS);
+    return token(KEYWORD);
+  }
+  
+  [^\ \t\r\n]+ {
+    return token(DOC_COMMENT);
+  }
 }
 
-[^\ \t\r\n]+ {
-  yybegin(YYINITIAL);
-  return token(DEFAULT);
+<YYCLASS> {
+  [^\ \t\r\n]+ {
+    yybegin(YYCLASS2);
+    return token(DEFAULT);
+  }
+}
+
+<YYCLASS2> {
+  "extends" {
+    yypush(YYEXTENDS);
+    return token(KEYWORD);
+  }
+  
+  "class" {
+    yybegin(YYCLASS);
+    return token(KEYWORD);
+  }
+  
+  [^\ \t\r\n]+ {
+    return token(DEFAULT);
+  }
+}
+
+<YYEXTENDS> {
+  "extends" {
+    return token(KEYWORD);
+  }
+  
+  "class" {
+    yypop();
+    return token(KEYWORD);
+  }
+  
+  [^\ \t\r\n]+ {
+    return token(DEFAULT);
+  }
 }
 
 .|\r|\n {

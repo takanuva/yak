@@ -158,12 +158,16 @@ public class SyntaxDocument extends PlainDocument {
     
     // Finally, update our match map
     /// TODO: remake this
-    if(tokens.size() > 0)
+    if(tokens.size() > 0) {
       //
+      kit.onChangeAt(tokens.get(tokens.lastKey()));
       match_map = new MatchTreeMap(
         match_map.headMap(tokens.lastKey(), true)
       );
-    else match_map.clear();
+    } else {
+      kit.onChangeAt(null);
+      match_map.clear();
+    };
   };
   
   private synchronized void assureItsParsed(int end) {
@@ -176,7 +180,13 @@ public class SyntaxDocument extends PlainDocument {
     return getTokens(0, getLength());
   };
   
+  public synchronized Iterable<Token> getTokens(int from) {
+    return getTokens(from, getLength());
+  };
+  
   public synchronized Iterable<Token> getTokens(int from, int to) {
+    assert from <= to;
+    
     assureItsParsed(to);
     
     Integer f = tokens.floorKey(from);

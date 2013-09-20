@@ -67,10 +67,16 @@ public class MarkdownSyntaxKit extends NestableSyntaxKit {
      *
      */
     private JComponent makePreview() {
-      JEditorPane x = new JEditorPane();
-      JScrollPane y = new JScrollPane(x);
-      return y;
+      JPanel p = new JPanel();
+      
+      //p.setText("<b>l<i>o</i>l</b>");
+      return p;
     };
+    
+    /**
+     *
+     */
+    JButton button = null;
     
     //
     @Override

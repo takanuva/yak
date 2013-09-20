@@ -172,6 +172,11 @@ public class WidgetComponent extends JComponent {
   /**
    *
    */
+  private Component child;
+  
+  /**
+   *
+   */
   public WidgetComponent(DefaultSyntaxKit kit, Component c) {
     this(kit, c, true);
   };
@@ -182,7 +187,14 @@ public class WidgetComponent extends JComponent {
   public WidgetComponent(DefaultSyntaxKit kit, Component c, boolean resizable) {
     setLayout(new BorderLayout());
     setBorder(new ResizableBorder());
-    add(c);
+    add(child = c);
+  };
+  
+  /**
+   *
+   */
+  public Component getChild() {
+    return child;
   };
   
   public void setBorder(Border b) {
